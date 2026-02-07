@@ -2,18 +2,18 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Index, Integer, Numeric, String, Text, func
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.dbtypes import GUID, StringArray
 
 
 class Article(Base):
     __tablename__ = "articles"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
     source_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("sources.id", ondelete="SET NULL")
+        GUID, ForeignKey("sources.id", ondelete="SET NULL")
     )
 
     # Original content
@@ -31,7 +31,7 @@ class Article(Base):
     complexity_score: Mapped[float | None] = mapped_column(Numeric(3, 2))
 
     # Metadata
-    categories: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    categories: Mapped[list[str]] = mapped_column(StringArray, default=list)
     content_hash: Mapped[str | None] = mapped_column(String(64))
 
     # Processing status

@@ -2,21 +2,21 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Integer, Numeric, String, func
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.dbtypes import GUID, StringArray
 
 
 class Source(Base):
     __tablename__ = "sources"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     feed_url: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     source_type: Mapped[str] = mapped_column(String(50), default="rss")
     credibility_score: Mapped[float] = mapped_column(Numeric(3, 2), default=0.80)
-    categories: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    categories: Mapped[list[str]] = mapped_column(StringArray, default=list)
     fetch_interval_minutes: Mapped[int] = mapped_column(Integer, default=30)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

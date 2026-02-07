@@ -15,6 +15,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Startup
     if settings.sentry_dsn:
         sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment)
+
+    # Create tables for SQLite (no Alembic needed locally)
+    from app.database import IS_SQLITE, create_tables
+
+    if IS_SQLITE:
+        await create_tables()
+
     yield
     # Shutdown
 
