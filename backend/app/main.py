@@ -22,8 +22,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     if IS_SQLITE:
         await create_tables()
 
+    # Start background ingestion scheduler
+    from app.ingestion.scheduler import setup_scheduler
+
+    setup_scheduler()
+
     yield
+
     # Shutdown
+    from app.ingestion.scheduler import scheduler
+
+    scheduler.shutdown(wait=False)
 
 
 app = FastAPI(

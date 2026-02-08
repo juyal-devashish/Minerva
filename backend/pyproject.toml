@@ -27,6 +27,7 @@ datasketch = "^1.6.0"
 apscheduler = "^3.10.0"
 python-dotenv = "^1.0.0"
 sentry-sdk = {extras = ["fastapi"], version = "^1.40.0"}
+aiosqlite = "^0.19.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -35,7 +36,6 @@ pytest-cov = "^4.1.0"
 httpx = "^0.26.0"
 ruff = "^0.2.0"
 mypy = "^1.8.0"
-aiosqlite = "^0.19.0"
 
 [build-system]
 requires = ["poetry-core"]

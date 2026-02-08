@@ -2,14 +2,22 @@ from collections.abc import AsyncIterator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.pool import StaticPool
 
 from app.config import settings
+
+_is_sqlite = "sqlite" in settings.database_url
+
+# SQLite needs StaticPool (single connection) to avoid "database is locked" errors
+_engine_kwargs: dict = {}
+if _is_sqlite:
+    _engine_kwargs["connect_args"] = {"check_same_thread": False}
+    _engine_kwargs["poolclass"] = StaticPool
 
 engine = create_async_engine(
     settings.database_url,
     echo=(settings.environment == "development"),
-    # SQLite needs this for async
-    **({} if "postgresql" in settings.database_url else {"connect_args": {"check_same_thread": False}}),
+    **_engine_kwargs,
 )
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

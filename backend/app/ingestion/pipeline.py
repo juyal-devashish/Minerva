@@ -44,21 +44,23 @@ class IngestionPipeline:
         logger.info("Starting ingestion pipeline")
         processed = 0
 
+        # Ensure sources exist in their own session
         async with async_session() as db:
-            # Ensure sources exist
             await self._ensure_sources(db)
-
-            for source_config in NEWS_SOURCES:
-                try:
-                    count = await self._process_source(source_config, db)
-                    processed += count
-                except Exception:
-                    logger.error(
-                        f"Failed to process source: {source_config['name']}",
-                        exc_info=True,
-                    )
-
             await db.commit()
+
+        # Process each source in its own session to isolate failures
+        for source_config in NEWS_SOURCES:
+            try:
+                async with async_session() as db:
+                    count = await self._process_source(source_config, db)
+                    await db.commit()
+                    processed += count
+            except Exception:
+                logger.error(
+                    f"Failed to process source: {source_config['name']}",
+                    exc_info=True,
+                )
 
         logger.info(f"Ingestion pipeline complete. Processed {processed} articles.")
         return processed
@@ -99,9 +101,11 @@ class IngestionPipeline:
 
             try:
                 await self._process_article(article_data, source_config, db)
+                await db.flush()
                 processed += 1
             except Exception:
                 logger.error(f"Failed to process article: {article_data.url}", exc_info=True)
+                await db.rollback()
 
         # Update source last_fetched_at
         source_result = await db.execute(

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
+from app.database import IS_SQLITE, get_db
 from app.models.article import Article
 from app.models.entity import ArticleEntity
 from app.models.source import Source
@@ -28,7 +28,13 @@ async def get_feed(
     )
 
     if category:
-        query = query.where(Article.categories.contains([category]))
+        if IS_SQLITE:
+            # JSON array stored as text in SQLite — use json_each or LIKE
+            query = query.where(
+                text("EXISTS (SELECT 1 FROM json_each(articles.categories) WHERE json_each.value = :cat)")
+            ).params(cat=category)
+        else:
+            query = query.where(Article.categories.contains([category]))
 
     # Count total
     count_query = select(func.count()).select_from(query.subquery())

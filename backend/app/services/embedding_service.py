@@ -1,7 +1,9 @@
-from pinecone import Pinecone
+import logging
 
 from app.config import settings
 from app.services.llm_service import LLMService
+
+logger = logging.getLogger(__name__)
 
 
 class EmbeddingService:
@@ -9,12 +11,16 @@ class EmbeddingService:
 
     def __init__(self) -> None:
         self.llm = LLMService()
+        self.pc = None
+        self.index = None
         if settings.pinecone_api_key:
-            self.pc = Pinecone(api_key=settings.pinecone_api_key)
-            self.index = self.pc.Index(settings.pinecone_index)
-        else:
-            self.pc = None
-            self.index = None
+            try:
+                from pinecone import Pinecone
+
+                self.pc = Pinecone(api_key=settings.pinecone_api_key)
+                self.index = self.pc.Index(settings.pinecone_index)
+            except Exception:
+                logger.warning("Pinecone not available, embedding search disabled")
 
     async def upsert(self, id: str, text: str, metadata: dict) -> None:
         """Generate embedding and upsert into Pinecone.

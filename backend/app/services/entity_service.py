@@ -1,4 +1,11 @@
+import logging
+
 import httpx
+
+logger = logging.getLogger(__name__)
+
+# Wikimedia APIs require a User-Agent header
+_HEADERS = {"User-Agent": "Minerva/0.1 (https://github.com/minerva; minerva@example.com)"}
 
 
 class EntityService:
@@ -16,7 +23,7 @@ class EntityService:
         Returns:
             Wikidata ID (e.g., "Q189729") or None.
         """
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(headers=_HEADERS, timeout=15.0) as client:
             response = await client.get(
                 self.WIKIDATA_API,
                 params={
@@ -27,6 +34,10 @@ class EntityService:
                     "limit": 1,
                 },
             )
+            if response.status_code != 200:
+                logger.warning(f"Wikidata search returned {response.status_code} for '{text}'")
+                return None
+
             data = response.json()
 
             if data.get("search"):
@@ -42,7 +53,7 @@ class EntityService:
         Returns:
             English Wikipedia URL or None.
         """
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(headers=_HEADERS, timeout=15.0) as client:
             response = await client.get(
                 self.WIKIDATA_API,
                 params={
@@ -53,6 +64,10 @@ class EntityService:
                     "format": "json",
                 },
             )
+            if response.status_code != 200:
+                logger.warning(f"Wikidata entity lookup returned {response.status_code}")
+                return None
+
             data = response.json()
 
             entity = data.get("entities", {}).get(wikidata_id, {})
@@ -74,7 +89,7 @@ class EntityService:
 
         title = url.split("/wiki/")[-1]
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(headers=_HEADERS, timeout=15.0) as client:
             response = await client.get(
                 self.WIKIPEDIA_API,
                 params={
@@ -86,6 +101,10 @@ class EntityService:
                     "format": "json",
                 },
             )
+            if response.status_code != 200:
+                logger.warning(f"Wikipedia extract returned {response.status_code}")
+                return None
+
             data = response.json()
 
             pages = data.get("query", {}).get("pages", {})

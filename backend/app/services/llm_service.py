@@ -1,14 +1,22 @@
-from openai import AsyncOpenAI
+import logging
 
 from app.config import settings
 from app.services.cache_service import CacheService
+
+logger = logging.getLogger(__name__)
 
 
 class LLMService:
     """OpenAI LLM interface for context generation and follow-up answers."""
 
     def __init__(self) -> None:
-        self.client = AsyncOpenAI(api_key=settings.openai_api_key)
+        self.client = None
+        if settings.openai_api_key:
+            from openai import AsyncOpenAI
+
+            self.client = AsyncOpenAI(api_key=settings.openai_api_key)
+        else:
+            logger.warning("OpenAI API key not set, LLM features disabled")
         self.cache = CacheService()
 
     async def generate(
@@ -29,6 +37,9 @@ class LLMService:
         Returns:
             The generated text.
         """
+        if not self.client:
+            return "(LLM unavailable — set OPENAI_API_KEY to enable context generation)"
+
         response = await self.client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
@@ -46,6 +57,9 @@ class LLMService:
         Returns:
             Embedding vector (1536 dimensions).
         """
+        if not self.client:
+            return []
+
         response = await self.client.embeddings.create(
             model="text-embedding-3-small",
             input=text,

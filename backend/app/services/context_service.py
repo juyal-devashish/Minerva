@@ -62,27 +62,31 @@ class ContextService:
                 ),
             )
 
-        # 2. Retrieve knowledge
-        wikipedia_extract = await self.entity_service.get_wikipedia_extract(
-            entity.wikipedia_url or ""
-        )
+        # 2. If entity already has pre-stored context and LLM is unavailable, use it
+        if entity.short_context and not self.llm.client:
+            context_text = entity.short_context
+        else:
+            # Retrieve knowledge
+            wikipedia_extract = await self.entity_service.get_wikipedia_extract(
+                entity.wikipedia_url or ""
+            )
 
-        # 3. Search for related articles via embeddings
-        related_results = await self.embedding_service.search(
-            entity.canonical_name, top_k=3
-        )
+            # Search for related articles via embeddings
+            related_results_for_prompt = await self.embedding_service.search(
+                entity.canonical_name, top_k=3
+            )
 
-        # 4. Build prompt and call LLM
-        prompt = PROMPTS["entity_context"]["v1"]["template"].format(
-            entity_name=entity.canonical_name,
-            entity_type=entity.entity_type,
-            article_excerpt="",
-            wikidata_facts="",
-            wikipedia_excerpt=wikipedia_extract or "No Wikipedia information available.",
-            related_articles_summaries="",
-        )
+            # Build prompt and call LLM
+            prompt = PROMPTS["entity_context"]["v1"]["template"].format(
+                entity_name=entity.canonical_name,
+                entity_type=entity.entity_type,
+                article_excerpt="",
+                wikidata_facts="",
+                wikipedia_excerpt=wikipedia_extract or "No Wikipedia information available.",
+                related_articles_summaries="",
+            )
 
-        context_text = await self.llm.generate(prompt, model="gpt-4o-mini", max_tokens=300)
+            context_text = await self.llm.generate(prompt, model="gpt-4o-mini", max_tokens=300)
 
         # 5. Cache result
         now = datetime.now(UTC)
@@ -94,6 +98,9 @@ class ContextService:
 
         # 6. Get related entities from same articles
         related_entities = await self._get_related_entities(entity, db)
+
+        # 7. Get related articles via embeddings (if available)
+        related_results = await self.embedding_service.search(entity.canonical_name, top_k=3)
 
         return ContextResponse(
             entity=EntityInfo(
