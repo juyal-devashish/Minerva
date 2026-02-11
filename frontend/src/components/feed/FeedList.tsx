@@ -3,8 +3,12 @@
 import { useFeed } from "@/hooks/useFeed";
 import { ArticleCard } from "./ArticleCard";
 
-export function FeedList() {
-  const { data, isLoading, error } = useFeed();
+interface FeedListProps {
+  category?: string;
+}
+
+export function FeedList({ category }: FeedListProps) {
+  const { data, isLoading, error } = useFeed({ category });
 
   if (isLoading) {
     return (

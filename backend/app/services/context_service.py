@@ -154,7 +154,7 @@ class ContextService:
             retrieved_knowledge=wikipedia_extract or "",
         )
 
-        answer = await self.llm.generate(prompt, model="gpt-4o", max_tokens=500, temperature=0.4)
+        answer = await self.llm.generate(prompt, model="gpt-4o-mini", max_tokens=500, temperature=0.4)
 
         return ExplainResponse(
             entity=EntityInfo(

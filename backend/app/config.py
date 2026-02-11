@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     followup_rate_limit: int = 20
     rate_limit_window: int = 3600  # 1 hour
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": ("../.env", ".env"), "env_file_encoding": "utf-8"}
 
 
 settings = Settings()

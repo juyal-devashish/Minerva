@@ -1,7 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import { FeedList } from "@/components/feed/FeedList";
 import { CategoryTabs } from "@/components/feed/CategoryTabs";
 
 export default function FeedPage() {
+  const [category, setCategory] = useState("all");
+
   return (
     <main className="container mx-auto max-w-2xl px-4 py-6">
       <header className="mb-6">
@@ -10,8 +15,8 @@ export default function FeedPage() {
           News with context, instantly
         </p>
       </header>
-      <CategoryTabs />
-      <FeedList />
+      <CategoryTabs active={category} onChange={setCategory} />
+      <FeedList category={category} />
     </main>
   );
 }
