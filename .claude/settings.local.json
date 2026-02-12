@@ -1,7 +1,33 @@
 {
   "permissions": {
     "allow": [
-      "Bash(poetry run python:*)"
+      "Bash(poetry run python:*)",
+      "Read(//Users/juyal/.claude/**)",
+      "Bash(poetry run uvicorn:*)",
+      "Bash(export PATH=\"/opt/homebrew/opt/node@20/bin:$PATH\")",
+      "Bash(npm run dev:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(poetry add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(node -e:*)",
+      "Bash(npm run build:*)",
+      "Bash(PATH=\"/opt/homebrew/opt/node@20/bin:$PATH\" npm run build:*)",
+      "Bash(npx next build:*)",
+      "Bash(PATH=\"/opt/homebrew/opt/node@20/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:$PATH\")",
+      "Bash(node_modules/.bin/next build)",
+      "Bash(npx vercel:*)",
+      "Bash(npm install:*)",
+      "Bash(vercel whoami:*)",
+      "Bash(vercel:*)",
+      "WebFetch(domain:frontend-roan-nine-nf5erh3avr.vercel.app)",
+      "WebFetch(domain:frontend-5p4qlsi9h-devashish-juyals-projects.vercel.app)",
+      "Bash(/opt/homebrew/opt/python@3.12/bin/python3.12:*)",
+      "Bash(pip3 show:*)"
     ]
   }
 }
