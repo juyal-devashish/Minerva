@@ -1,77 +1,224 @@
 "use client";
 
+import { ExternalLink, ChevronRight, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEntityContext } from "@/hooks/useEntityContext";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { EntityBadge } from "@/components/ui/entity-badge";
 import type { EntityInArticle } from "@/types";
 
 interface Props {
   entity: EntityInArticle;
+  articleId: string;
   onClose: () => void;
-  onFollowup: () => void;
+  onViewReferences: () => void;
 }
 
-export function ContextPopup({ entity, onClose, onFollowup }: Props) {
+export function ContextPopup({ entity, articleId, onClose, onViewReferences }: Props) {
   const { data, isLoading, error } = useEntityContext(entity.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <Card className="relative z-10 w-full max-w-sm mx-4 mb-4 sm:mb-0 shadow-xl">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold">{entity.text}</h3>
-              <span className="text-xs text-muted-foreground uppercase">
-                {entity.type}
-              </span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              X
-            </Button>
-          </div>
-        </CardHeader>
+    <AnimatePresence>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={onClose}
+        className="fixed inset-0 z-40"
+        style={{
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          maxWidth: "393px",
+          margin: "0 auto",
+        }}
+      />
 
-        <CardContent>
-          {isLoading && (
-            <div className="flex items-center justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-            </div>
-          )}
+      {/* Bottom Sheet */}
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{
+          type: "spring",
+          damping: 25,
+          stiffness: 300,
+        }}
+        className="fixed bottom-0 left-0 right-0 rounded-t-3xl z-50"
+        style={{
+          backgroundColor: "var(--surface)",
+          maxWidth: "393px",
+          margin: "0 auto",
+          maxHeight: "50vh",
+          boxShadow: "0 -4px 24px rgba(0, 0, 0, 0.15)",
+        }}
+      >
+        {/* Drag Handle */}
+        <div className="flex justify-center pt-3 pb-2">
+          <div
+            className="w-9 h-1 rounded-full"
+            style={{ backgroundColor: "var(--divider)" }}
+          />
+        </div>
 
-          {error && (
-            <p className="text-sm text-destructive">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--background-secondary)] transition-colors"
+        >
+          <X size={18} style={{ color: "var(--text-secondary)" }} />
+        </button>
+
+        {/* Content */}
+        <div
+          className="px-6 pb-6 overflow-y-auto"
+          style={{ maxHeight: "calc(50vh - 60px)" }}
+        >
+          {isLoading ? (
+            /* Loading Skeleton */
+            <div className="space-y-3">
+              <div
+                className="h-6 w-48 rounded animate-pulse"
+                style={{ backgroundColor: "var(--background-secondary)" }}
+              />
+              <div
+                className="h-4 w-24 rounded animate-pulse"
+                style={{ backgroundColor: "var(--background-secondary)" }}
+              />
+              <div className="space-y-2 pt-2">
+                <div
+                  className="h-4 w-full rounded animate-pulse"
+                  style={{ backgroundColor: "var(--background-secondary)" }}
+                />
+                <div
+                  className="h-4 w-full rounded animate-pulse"
+                  style={{ backgroundColor: "var(--background-secondary)" }}
+                />
+                <div
+                  className="h-4 w-3/4 rounded animate-pulse"
+                  style={{ backgroundColor: "var(--background-secondary)" }}
+                />
+              </div>
+            </div>
+          ) : error ? (
+            <p
+              style={{
+                fontFamily: "Roboto, sans-serif",
+                fontSize: "14px",
+                color: "var(--error)",
+              }}
+            >
               Failed to load context. Tap to retry.
             </p>
-          )}
-
-          {data && (
+          ) : data ? (
             <>
-              <p className="text-sm text-muted-foreground mb-4">
+              {/* Entity Name */}
+              <h2
+                className="mb-2"
+                style={{
+                  fontFamily: "Poppins, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "20px",
+                  color: "var(--foreground)",
+                }}
+              >
+                {entity.text}
+              </h2>
+
+              {/* Entity Type Badge */}
+              <div className="mb-4">
+                <EntityBadge type={entity.type} />
+              </div>
+
+              {/* Context Paragraph */}
+              <p
+                className="mb-4"
+                style={{
+                  fontFamily: "Roboto, sans-serif",
+                  fontSize: "15px",
+                  lineHeight: "1.55",
+                  color: "var(--foreground)",
+                }}
+              >
                 {data.context.text}
               </p>
 
-              <div className="flex gap-2">
-                {data.entity.wikipedia_url && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a
-                      href={data.entity.wikipedia_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Wikipedia
-                    </a>
-                  </Button>
-                )}
+              {/* Wikipedia Link */}
+              {data.entity.wikipedia_url && (
+                <a
+                  href={data.entity.wikipedia_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 mb-4 hover:opacity-80 transition-opacity"
+                >
+                  <span
+                    style={{
+                      fontFamily: "Roboto, sans-serif",
+                      fontWeight: 500,
+                      fontSize: "14px",
+                      color: "var(--accent-secondary)",
+                    }}
+                  >
+                    Read on Wikipedia
+                  </span>
+                  <ExternalLink
+                    size={14}
+                    style={{ color: "var(--accent-secondary)" }}
+                  />
+                </a>
+              )}
 
-                <Button variant="outline" size="sm" onClick={onFollowup}>
-                  Ask More
-                </Button>
+              {/* Divider */}
+              <div
+                className="h-px my-4"
+                style={{ backgroundColor: "var(--divider)" }}
+              />
+
+              {/* View All References */}
+              <button
+                onClick={() => {
+                  onClose();
+                  onViewReferences();
+                }}
+                className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+              >
+                <span
+                  style={{
+                    fontFamily: "Roboto, sans-serif",
+                    fontWeight: 500,
+                    fontSize: "14px",
+                    color: "var(--accent-primary)",
+                  }}
+                >
+                  View all references
+                </span>
+                <ChevronRight
+                  size={16}
+                  style={{ color: "var(--accent-primary)" }}
+                />
+              </button>
+
+              {/* Follow-up Input */}
+              <div
+                className="mt-6 pt-4 border-t"
+                style={{ borderColor: "var(--divider)" }}
+              >
+                <input
+                  type="text"
+                  placeholder="Ask a follow-up question..."
+                  className="w-full px-4 py-3 rounded-xl outline-none"
+                  style={{
+                    backgroundColor: "var(--background-secondary)",
+                    fontFamily: "Roboto, sans-serif",
+                    fontSize: "14px",
+                    color: "var(--foreground)",
+                  }}
+                  disabled
+                />
               </div>
             </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          ) : null}
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

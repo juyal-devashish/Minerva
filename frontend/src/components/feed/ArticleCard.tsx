@@ -1,56 +1,244 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import { Sparkles } from "lucide-react";
 import type { ArticleCard as ArticleCardType } from "@/types";
 
 interface Props {
   article: ArticleCardType;
+  variant?: "hero" | "standard" | "compact";
+  onClick?: () => void;
 }
 
-export function ArticleCard({ article }: Props) {
-  return (
-    <Link href={`/article/${article.id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer">
-        <CardContent className="p-4">
-          <div className="flex gap-4">
-            {article.image_url && (
-              <div className="flex-shrink-0 w-24 h-24 rounded-md overflow-hidden bg-muted">
-                <img
-                  src={article.image_url}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
+function formatTimeAgo(dateStr?: string): string {
+  if (!dateStr) return "";
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const hours = Math.floor(diff / 3600000);
+  if (hours < 1) return "Just now";
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+export function ArticleCard({ article, variant = "standard", onClick }: Props) {
+  const timeAgo = formatTimeAgo(article.published_at);
+  const readTime = article.reading_time_minutes
+    ? `${article.reading_time_minutes} min read`
+    : "";
+
+  const content = (() => {
+    if (variant === "hero") {
+      return (
+        <div className="relative w-full h-[400px] rounded-xl overflow-hidden cursor-pointer mb-3">
+          {article.image_url ? (
+            <img
+              src={article.image_url}
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div
+              className="w-full h-full"
+              style={{ backgroundColor: "var(--background-secondary)" }}
+            />
+          )}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%)",
+            }}
+          />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <span
+                className="text-white/80"
+                style={{
+                  fontFamily: "Roboto, sans-serif",
+                  fontSize: "12px",
+                }}
+              >
+                {article.source.name}
+                {timeAgo && ` · ${timeAgo}`}
+              </span>
+            </div>
+            <h2
+              className="text-white mb-2 line-clamp-3"
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: 600,
+                fontSize: "20px",
+                lineHeight: "1.3",
+              }}
+            >
+              {article.title}
+            </h2>
+            {article.entity_count > 0 && (
+              <div className="flex items-center gap-2">
+                <div
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full"
+                  style={{
+                    backgroundColor: "rgba(107, 159, 212, 0.3)",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <Sparkles size={12} className="text-white" />
+                  <span
+                    className="text-white"
+                    style={{
+                      fontFamily: "Roboto, sans-serif",
+                      fontWeight: 500,
+                      fontSize: "11px",
+                    }}
+                  >
+                    {article.entity_count} key terms
+                  </span>
+                </div>
               </div>
             )}
-            <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-base line-clamp-2 mb-1">
-                {article.title}
-              </h2>
-              {article.summary && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                  {article.summary}
-                </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (variant === "compact") {
+      return (
+        <div className="flex gap-3 p-3 rounded-lg cursor-pointer hover:bg-[var(--background-secondary)] transition-colors">
+          {article.image_url && (
+            <img
+              src={article.image_url}
+              alt={article.title}
+              className="w-[72px] h-[72px] rounded-lg object-cover flex-shrink-0"
+            />
+          )}
+          <div className="flex-1 min-w-0">
+            <h3
+              className="line-clamp-2 mb-1"
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: 500,
+                fontSize: "15px",
+                lineHeight: "1.4",
+                color: "var(--foreground)",
+              }}
+            >
+              {article.title}
+            </h3>
+            <div
+              className="flex items-center gap-1.5"
+              style={{
+                fontFamily: "Roboto, sans-serif",
+                fontSize: "12px",
+                color: "var(--text-tertiary)",
+              }}
+            >
+              <span>{article.source.name}</span>
+              {timeAgo && (
+                <>
+                  <span>·</span>
+                  <span>{timeAgo}</span>
+                </>
               )}
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{article.source.name}</span>
-                {article.reading_time_minutes && (
-                  <>
-                    <span>&middot;</span>
-                    <span>{article.reading_time_minutes} min read</span>
-                  </>
-                )}
-                {article.entity_count > 0 && (
-                  <>
-                    <span>&middot;</span>
-                    <span>{article.entity_count} entities</span>
-                  </>
-                )}
-              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </Link>
-  );
+        </div>
+      );
+    }
+
+    // Standard variant
+    return (
+      <div
+        className="rounded-xl overflow-hidden cursor-pointer transition-all hover:scale-[1.01]"
+        style={{
+          backgroundColor: "var(--background-secondary)",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        }}
+      >
+        {article.image_url && (
+          <img
+            src={article.image_url}
+            alt={article.title}
+            className="w-full h-[180px] object-cover"
+          />
+        )}
+        <div className="p-4">
+          <h3
+            className="line-clamp-2 mb-2"
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              fontWeight: 500,
+              fontSize: "17px",
+              lineHeight: "1.4",
+              color: "var(--foreground)",
+            }}
+          >
+            {article.title}
+          </h3>
+          {article.summary && (
+            <p
+              className="line-clamp-2 mb-3"
+              style={{
+                fontFamily: "Roboto, sans-serif",
+                fontSize: "14px",
+                lineHeight: "1.5",
+                color: "var(--text-secondary)",
+              }}
+            >
+              {article.summary}
+            </p>
+          )}
+          <div className="flex items-center justify-between">
+            <div
+              className="flex items-center gap-1.5"
+              style={{
+                fontFamily: "Roboto, sans-serif",
+                fontSize: "12px",
+                color: "var(--text-tertiary)",
+              }}
+            >
+              <span>{article.source.name}</span>
+              {timeAgo && (
+                <>
+                  <span>·</span>
+                  <span>{timeAgo}</span>
+                </>
+              )}
+              {readTime && (
+                <>
+                  <span>·</span>
+                  <span>{readTime}</span>
+                </>
+              )}
+            </div>
+            {article.entity_count > 0 && (
+              <div
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
+                style={{
+                  backgroundColor: "rgba(58, 90, 140, 0.15)",
+                  color: "var(--accent-secondary)",
+                }}
+              >
+                <Sparkles size={10} />
+                <span
+                  style={{
+                    fontFamily: "Roboto, sans-serif",
+                    fontWeight: 500,
+                    fontSize: "11px",
+                  }}
+                >
+                  {article.entity_count} key terms
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  })();
+
+  if (onClick) {
+    return <div onClick={onClick}>{content}</div>;
+  }
+
+  return <Link href={`/article/${article.id}`}>{content}</Link>;
 }
