@@ -2,49 +2,49 @@
 
 ## Project Overview
 
-**Minerva** is an AI-powered contextual news intelligence platform that provides instant, personalized explanations for unfamiliar terms, people, events, and concepts within news articles.
+**Minerva** is an AI-powered contextual news intelligence platform that provides instant explanations for unfamiliar terms, people, events, and concepts within news articles.
 
-**Core Value Proposition**: Eliminate the friction between "I don't know this" and understanding—no tab-switching, no ChatGPT copy-paste, just inline context exactly when readers need it.
+**Core Value Proposition**: Eliminate the friction between "I don't know this" and understanding — no tab-switching, no ChatGPT copy-paste, just inline context exactly when readers need it.
 
 **Target Users**: Gen-Z and millennial news readers who churn from publications because articles assume prior knowledge they don't have.
 
 ---
 
-## Tech Stack
+## Architecture (Actual Implementation)
 
-### Backend Services
-- **Language**: Python 3.11+
-- **Framework**: FastAPI (async-first, high performance)
-- **Task Queue**: Celery + Redis
-- **Message Broker**: Apache Kafka
-- **Scheduler**: Apache Airflow
-- **API Gateway**: Kong or AWS API Gateway
+Minerva uses a **monolithic backend + SPA frontend** architecture:
 
-### Databases
-- **Primary DB**: PostgreSQL 15+ (source management, user data)
-- **Document Store**: MongoDB (articles, processed content)
-- **Knowledge Graph**: Neo4j (entity relationships)
-- **Vector Store**: Pinecone or Weaviate (RAG embeddings)
-- **Cache**: Redis (user profiles, hot context responses)
+```
+Frontend (Next.js 14 on Vercel)
+    ↕ REST JSON
+Backend (FastAPI monolith on :8000)
+    ↕
+PostgreSQL / SQLite  ·  Redis  ·  Pinecone  ·  OpenAI API
+```
 
-### ML/AI Stack
-- **NER**: spaCy with fine-tuned transformer (en_core_web_trf base)
-- **Embeddings**: sentence-transformers (all-MiniLM-L6-v2 or OpenAI ada-002)
-- **LLM**: Claude API (primary) / Mistral 7B (fallback/cost optimization)
-- **ML Framework**: PyTorch, Hugging Face Transformers
+### Backend (`backend/`)
+- **Language**: Python 3.12 (managed via Poetry)
+- **Framework**: FastAPI with async SQLAlchemy 2.0
+- **Validation**: Pydantic v2
+- **NER**: spaCy 3.8 with `en_core_web_trf` transformer model
+- **LLM**: OpenAI GPT-4o-mini (summaries, context) and GPT-4o (follow-ups)
+- **Embeddings**: OpenAI `text-embedding-3-small` via Pinecone
+- **Database**: PostgreSQL 15 (production via Supabase) or SQLite (local dev, auto-created)
+- **Cache**: Redis 7 (production via Upstash, local via Docker)
+- **Vectors**: Pinecone (article embeddings for semantic search + RAG)
+- **Scheduler**: APScheduler (hourly ingestion pipeline)
+- **Error tracking**: Sentry (optional)
 
-### Frontend / Client
-- **Browser Extension**: Plasmo framework (React-based, cross-browser)
-- **Web Dashboard**: Next.js 14+ with TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand or Jotai
-
-### Infrastructure
-- **Cloud**: AWS (primary) or GCP
-- **Containers**: Docker + Docker Compose (dev), Kubernetes (prod)
-- **CI/CD**: GitHub Actions
-- **Monitoring**: Prometheus + Grafana, Sentry (errors)
-- **Logging**: ELK Stack or CloudWatch
+### Frontend (`frontend/`)
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript (strict mode)
+- **Data fetching**: React Query (TanStack Query v5)
+- **Styling**: Tailwind CSS 3.4 with hex-based CSS custom properties
+- **Animation**: Framer Motion (entity context bottom sheet)
+- **UI components**: shadcn/ui (Button, Card) + custom Figma-matched components
+- **Typography**: Poppins (headings/UI/buttons) + Roboto (body text)
+- **Design**: Mobile-first (393px max-width), light/dark mode
+- **Deployment**: Vercel
 
 ---
 
@@ -52,198 +52,143 @@
 
 ```
 minerva/
-├── CLAUDE.md                     # This file - project instructions
-├── README.md                     # Project overview and setup
-├── docker-compose.yml            # Local development environment
-├── docker-compose.prod.yml       # Production compose (reference)
-├── Makefile                      # Common commands
-├── .env.example                  # Environment variables template
-├── .github/
-│   └── workflows/
-│       ├── ci.yml                # Test and lint on PR
-│       ├── deploy-staging.yml    # Deploy to staging
-│       └── deploy-prod.yml       # Deploy to production
+├── backend/
+│   ├── app/
+│   │   ├── main.py              # FastAPI entry + lifespan (scheduler, table creation)
+│   │   ├── config.py            # Pydantic settings (env vars)
+│   │   ├── database.py          # SQLAlchemy engine (auto-detects Postgres vs SQLite)
+│   │   ├── dbtypes.py           # Cross-DB type compatibility
+│   │   ├── models/
+│   │   │   ├── article.py       # Article model (content, summary, categories)
+│   │   │   ├── entity.py        # Entity + ArticleEntity join table
+│   │   │   ├── source.py        # News source (feed URL, credibility)
+│   │   │   └── user.py          # User model
+│   │   ├── schemas/
+│   │   │   ├── feed.py          # FeedResponse, ArticleSummary, Pagination
+│   │   │   ├── article.py       # ArticleDetail, EntityInArticle
+│   │   │   ├── context.py       # ContextResponse, ExplainRequest/Response
+│   │   │   └── common.py        # Shared pagination schema
+│   │   ├── routers/
+│   │   │   ├── feed.py          # GET /api/v1/feed (?category, ?page, ?limit)
+│   │   │   ├── articles.py      # GET /api/v1/articles/{id}, GET .../reference
+│   │   │   ├── context.py       # GET /api/v1/context/{entity_id}, POST .../explain
+│   │   │   └── search.py        # GET /api/v1/search
+│   │   ├── services/
+│   │   │   ├── context_service.py   # Core RAG pipeline (cache → Pinecone → LLM)
+│   │   │   ├── llm_service.py       # OpenAI GPT-4o-mini / GPT-4o wrapper
+│   │   │   ├── embedding_service.py # Pinecone upsert + query
+│   │   │   ├── entity_service.py    # Entity CRUD operations
+│   │   │   ├── cache_service.py     # Redis get/set with TTL
+│   │   │   └── rate_limiter.py      # Token-bucket rate limiting
+│   │   ├── ingestion/
+│   │   │   ├── pipeline.py      # Full orchestrator: fetch→dedup→clean→NER→link→summarize→embed→store
+│   │   │   ├── fetcher.py       # RSS/Atom feed fetcher (feedparser + httpx)
+│   │   │   ├── cleaner.py       # HTML stripping, content hashing, reading time
+│   │   │   ├── dedup.py         # MinHash + LSH deduplication (datasketch)
+│   │   │   ├── ner.py           # spaCy en_core_web_trf entity extraction
+│   │   │   ├── linker.py        # Wikidata API + Wikipedia API entity linking
+│   │   │   ├── summarizer.py    # GPT-4o-mini article summarization
+│   │   │   ├── embedder.py      # Pinecone article embedding (text-embedding-3-small)
+│   │   │   ├── scheduler.py     # APScheduler (runs pipeline every hour)
+│   │   │   └── sources.py       # RSS feed URLs (BBC, NYT, Reuters, etc.)
+│   │   └── prompts/
+│   │       └── templates.py     # LLM prompt templates (context, follow-up, summary)
+│   ├── migrations/              # Alembic migrations (PostgreSQL only)
+│   ├── tests/
+│   │   ├── test_routers/        # API endpoint tests
+│   │   ├── test_services/       # Service unit tests
+│   │   └── test_ingestion/      # Pipeline tests (cleaner, dedup)
+│   └── pyproject.toml
 │
-├── services/
-│   ├── api-gateway/              # Kong/custom gateway config
-│   │
-│   ├── articles-service/         # Article serving API
-│   │   ├── Dockerfile
-│   │   ├── pyproject.toml
-│   │   ├── src/
-│   │   │   ├── main.py           # FastAPI app
-│   │   │   ├── routes/
-│   │   │   ├── models/
-│   │   │   ├── services/
-│   │   │   └── repositories/
-│   │   └── tests/
-│   │
-│   ├── context-service/          # Core product - context generation
-│   │   ├── Dockerfile
-│   │   ├── pyproject.toml
-│   │   ├── src/
-│   │   │   ├── main.py
-│   │   │   ├── routes/
-│   │   │   │   └── context.py    # POST /context endpoint
-│   │   │   ├── services/
-│   │   │   │   ├── rag.py        # Retrieval-augmented generation
-│   │   │   │   ├── llm.py        # LLM interface (Claude/Mistral)
-│   │   │   │   └── knowledge.py  # Knowledge graph queries
-│   │   │   ├── models/
-│   │   │   │   ├── requests.py
-│   │   │   │   └── responses.py
-│   │   │   └── prompts/
-│   │   │       └── context.py    # Prompt templates
-│   │   └── tests/
-│   │
-│   ├── user-service/             # User management & profiles
-│   │   ├── Dockerfile
-│   │   ├── pyproject.toml
-│   │   └── src/
-│   │       ├── main.py
-│   │       ├── routes/
-│   │       ├── services/
-│   │       │   └── knowledge_profile.py  # What user knows
-│   │       └── models/
-│   │
-│   └── ingestion/                # Content processing pipeline
-│       ├── fetcher/              # Fetch from news sources
-│       ├── deduplication/        # Remove duplicate articles
-│       ├── cleaner/              # Extract clean text
-│       ├── entity-extraction/    # NER + entity linking
-│       │   ├── Dockerfile
-│       │   ├── pyproject.toml
-│       │   └── src/
-│       │       ├── ner.py
-│       │       ├── linker.py     # Link to Wikidata/Wikipedia
-│       │       └── consumer.py   # Kafka consumer
-│       └── summarization/        # Article summaries
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── layout.tsx           # Root layout (Poppins + Roboto fonts)
+│   │   │   ├── page.tsx             # Tab-based SPA: Feed, Search, Bookmarks, Trending, Profile
+│   │   │   ├── providers.tsx        # React Query provider
+│   │   │   ├── article/[id]/
+│   │   │   │   ├── page.tsx         # Article detail route
+│   │   │   │   └── reference/page.tsx  # Reference page route
+│   │   │   └── search/page.tsx      # Search route (unused, SPA tab used instead)
+│   │   ├── components/
+│   │   │   ├── feed/
+│   │   │   │   ├── ArticleCard.tsx  # 3 variants: hero, standard, compact
+│   │   │   │   ├── CategoryTabs.tsx # Chip-style category filter
+│   │   │   │   └── FeedList.tsx     # Feed layout (hero first + standard rest)
+│   │   │   ├── article/
+│   │   │   │   ├── ArticleView.tsx      # Full article with scroll progress, hero image
+│   │   │   │   ├── ArticleContent.tsx   # Content wrapper
+│   │   │   │   ├── HighlightedText.tsx  # Entity text segmentation
+│   │   │   │   ├── EntityHighlight.tsx  # Tappable entity spans (gold underlines)
+│   │   │   │   └── ArticleHeader.tsx    # Legacy header component
+│   │   │   ├── context/
+│   │   │   │   ├── ContextPopup.tsx     # Animated bottom sheet (framer-motion)
+│   │   │   │   ├── ContextCard.tsx      # Legacy card component
+│   │   │   │   └── FollowupInput.tsx    # Follow-up question input
+│   │   │   ├── reference/
+│   │   │   │   ├── ReferencePage.tsx     # Entities grouped by type, expandable
+│   │   │   │   ├── EntityList.tsx       # Legacy entity list
+│   │   │   │   └── RelatedArticles.tsx  # Related articles section
+│   │   │   ├── navigation/
+│   │   │   │   └── BottomTabBar.tsx     # 5-tab bottom bar (Feed, Search, Bookmarks, Trending, Profile)
+│   │   │   ├── search/
+│   │   │   │   └── SearchScreen.tsx     # Search with recent searches + compact results
+│   │   │   ├── profile/
+│   │   │   │   └── ProfileScreen.tsx    # Settings, dark mode toggle
+│   │   │   ├── onboarding/
+│   │   │   │   └── OnboardingScreen.tsx # 3-step onboarding + category selection
+│   │   │   └── ui/
+│   │   │       ├── entity-badge.tsx     # Color-coded entity type badges
+│   │   │       ├── PlaceholderScreen.tsx # Generic placeholder (bookmarks, trending)
+│   │   │       ├── button.tsx           # shadcn/ui Button
+│   │   │       └── card.tsx             # shadcn/ui Card
+│   │   ├── hooks/
+│   │   │   ├── useFeed.ts          # Feed query with category + pagination
+│   │   │   ├── useArticle.ts       # Article detail query
+│   │   │   ├── useEntityContext.ts  # Entity context query
+│   │   │   ├── useReferencePage.ts  # Reference page query
+│   │   │   └── usePrefetch.ts      # Prefetch utilities
+│   │   ├── lib/
+│   │   │   ├── api.ts              # Fetch wrapper (all API calls)
+│   │   │   ├── queryClient.ts      # React Query client config
+│   │   │   └── utils.ts            # cn() utility
+│   │   ├── types/index.ts          # All TypeScript interfaces
+│   │   └── styles/globals.css      # Figma design tokens (light + dark mode)
+│   ├── tailwind.config.js          # Hex-based color tokens
+│   ├── tsconfig.json               # strict: true
+│   └── package.json
 │
-├── ml/
-│   ├── ner/
-│   │   ├── training/             # Fine-tuning scripts
-│   │   ├── evaluation/
-│   │   └── models/               # Model artifacts (gitignored)
-│   ├── embeddings/
-│   │   └── indexer.py            # Build vector indices
-│   └── experiments/              # Jupyter notebooks
-│
-├── clients/
-│   ├── browser-extension/        # Plasmo-based extension
-│   │   ├── package.json
-│   │   ├── plasmo.config.ts
-│   │   ├── src/
-│   │   │   ├── background.ts     # Service worker
-│   │   │   ├── content.tsx       # Content script (injected)
-│   │   │   ├── popup.tsx         # Extension popup
-│   │   │   ├── components/
-│   │   │   │   ├── ContextPopup.tsx
-│   │   │   │   └── HighlightedTerm.tsx
-│   │   │   ├── hooks/
-│   │   │   │   └── useContext.ts
-│   │   │   └── services/
-│   │   │       └── api.ts        # Minerva API client
-│   │   └── assets/
-│   │
-│   └── web-dashboard/            # User dashboard (Next.js)
-│       ├── package.json
-│       ├── next.config.js
-│       ├── src/
-│       │   ├── app/
-│       │   ├── components/
-│       │   └── lib/
-│       └── public/
-│
-├── infrastructure/
-│   ├── terraform/                # Infrastructure as code
-│   │   ├── modules/
-│   │   ├── environments/
-│   │   │   ├── staging/
-│   │   │   └── production/
-│   │   └── main.tf
-│   ├── kubernetes/               # K8s manifests
-│   │   ├── base/
-│   │   └── overlays/
-│   │       ├── staging/
-│   │       └── production/
-│   └── scripts/
-│       ├── setup-local.sh
-│       └── seed-db.sh
-│
-├── shared/
-│   ├── python/                   # Shared Python utilities
-│   │   ├── minerva_common/
-│   │   │   ├── __init__.py
-│   │   │   ├── config.py
-│   │   │   ├── logging.py
-│   │   │   ├── kafka.py
-│   │   │   └── exceptions.py
-│   │   └── pyproject.toml
-│   └── proto/                    # Protobuf definitions (if needed)
-│
-└── docs/
-    ├── architecture.md
-    ├── api-spec.yaml             # OpenAPI spec
-    ├── entity-schema.md
-    └── deployment.md
+├── figma_src/                  # Figma design reference components
+├── docker-compose.yml          # PostgreSQL 15 + Redis 7 (local dev)
+├── Makefile                    # Common dev commands
+├── .env.example                # Environment template
+└── .github/workflows/          # CI + deploy workflows
 ```
 
 ---
 
 ## Development Guidelines
 
-### Code Style & Standards
+### Code Style
 
-**Python**:
-- Use `ruff` for linting and formatting (replaces black, isort, flake8)
-- Type hints required for all function signatures
-- Docstrings for public functions (Google style)
+**Python** (backend):
+- `ruff` for linting and formatting
+- Type hints required on all function signatures
+- Google-style docstrings for public functions
 - Async-first for all I/O operations
-- Pydantic for all data validation
+- Pydantic v2 for all data validation
+- ruff ignores E501 in `app/prompts/templates.py` (long template strings)
 
-```python
-# Example service pattern
-from pydantic import BaseModel
-from typing import Optional
-
-class ContextRequest(BaseModel):
-    term: str
-    article_url: str
-    surrounding_text: str
-    user_id: Optional[str] = None
-
-class ContextResponse(BaseModel):
-    term: str
-    explanation: str
-    sources: list[str]
-    related_terms: list[str]
-    confidence: float
-
-async def get_context(request: ContextRequest) -> ContextResponse:
-    """Generate contextual explanation for a term.
-    
-    Args:
-        request: The context request containing term and article info.
-        
-    Returns:
-        ContextResponse with explanation and metadata.
-    """
-    # Implementation
-    ...
-```
-
-**TypeScript/JavaScript**:
-- ESLint + Prettier
-- Strict TypeScript mode
+**TypeScript** (frontend):
+- ESLint (next config) for linting
+- `strict: true` in tsconfig.json
 - Functional components with hooks
-- Zod for runtime validation
+- React Query for all server state
 
 ### Git Workflow
 
 ```bash
 main              # Production-ready code
-├── staging       # Pre-production testing
-└── feature/*     # Feature branches
 
 # Branch naming
 feature/context-service-rag
@@ -255,478 +200,160 @@ chore/update-dependencies
 ```
 feat(context): add adaptive depth based on user profile
 fix(ner): handle edge case with hyphenated names
-docs(api): update OpenAPI spec for /context endpoint
-perf(rag): cache frequent entity lookups in Redis
+chore(deps): update spacy to 3.8
 ```
 
-### Testing Requirements
-
-- **Unit tests**: Required for all business logic (pytest)
-- **Integration tests**: Required for API endpoints
-- **E2E tests**: Required for critical user flows (Playwright)
-- **Coverage**: Minimum 80% for core services
+### Testing
 
 ```bash
-# Run tests
-make test                    # All tests
-make test-unit               # Unit only
-make test-integration        # Integration only
-make test-coverage           # With coverage report
+cd backend && poetry run pytest -v           # 6 tests passing
+cd frontend && npm run build                 # Type-check + build (0 errors)
+cd backend && poetry run pytest --cov=app    # Coverage report
 ```
 
 ---
 
-## Service Specifications
+## Key API Endpoints
 
-### Context Service API
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Health check |
+| GET | `/api/v1/feed` | Paginated feed (`?category=`, `?page=`, `?limit=`) |
+| GET | `/api/v1/articles/{id}` | Article with entities (positions + types + priorities) |
+| GET | `/api/v1/articles/{id}/reference` | Reference page — entities grouped by type |
+| GET | `/api/v1/context/{entity_id}` | Entity context via RAG pipeline |
+| POST | `/api/v1/context/explain` | Follow-up question about an entity |
+| GET | `/api/v1/search` | Semantic search via Pinecone |
 
-**POST /api/v1/context**
+---
 
-Primary endpoint - generates contextual explanation for a term.
+## Ingestion Pipeline
 
-```python
-# Request
-{
-    "term": "Philip Glass",
-    "article_url": "https://nytimes.com/...",
-    "surrounding_text": "Philip Glass Withdraws From Kennedy Center...",
-    "user_id": "usr_abc123",  # optional
-    "depth": "auto"  # auto | brief | detailed
-}
+Runs hourly via APScheduler. Each source processed independently.
 
-# Response
-{
-    "term": "Philip Glass",
-    "explanation": "American composer known for minimalist music. One of the most influential composers of the late 20th century, famous for works like 'Einstein on the Beach' and film scores for 'The Hours' and 'Koyaanisqatsi'.",
-    "sources": [
-        {"title": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Philip_Glass"},
-        {"title": "Related: Kennedy Center Cancellations", "url": "..."}
-    ],
-    "related_terms": ["Kennedy Center", "National Symphony Orchestra", "minimalist music"],
-    "confidence": 0.94,
-    "cached": false,
-    "latency_ms": 342
-}
+```
+RSS Fetch → MinHash Dedup → HTML Clean → spaCy NER (en_core_web_trf)
+→ Wikidata/Wikipedia Link → GPT-4o-mini Summarize → Pinecone Embed → DB Store
 ```
 
-**Target Latency**: <500ms p95
+News sources configured in `backend/app/ingestion/sources.py`:
+BBC, NYT, Reuters, Al Jazeera, The Guardian, NPR, AP News, Ars Technica, and more.
 
-**POST /api/v1/context/batch**
+---
 
-Batch endpoint for pre-processing article terms.
+## Context Generation Pipeline (RAG)
 
-```python
-# Request
-{
-    "article_url": "https://nytimes.com/...",
-    "article_text": "Full article text...",
-    "user_id": "usr_abc123"
-}
-
-# Response
-{
-    "highlightable_terms": [
-        {"term": "Philip Glass", "start": 0, "end": 12, "type": "PERSON", "priority": "high"},
-        {"term": "Kennedy Center", "start": 29, "end": 43, "type": "ORG", "priority": "high"},
-        ...
-    ],
-    "pre_cached": 3  # Number of contexts pre-generated
-}
 ```
-
-### Entity Extraction Service
-
-Kafka consumer that processes cleaned articles.
-
-**Input Topic**: `cleaned_articles`
-**Output Topic**: `articles_with_entities`
-
-```python
-# Message schema
-{
-    "article_id": "art_xyz789",
-    "entities": [
-        {
-            "text": "Philip Glass",
-            "type": "PERSON",
-            "start_char": 0,
-            "end_char": 12,
-            "wikidata_id": "Q189729",
-            "wikipedia_url": "https://en.wikipedia.org/wiki/Philip_Glass",
-            "confidence": 0.97
-        },
-        ...
-    ],
-    "relationships": [
-        {"source": "Philip Glass", "relation": "WITHDREW_FROM", "target": "Kennedy Center"}
-    ]
-}
+User taps entity → Check Redis cache
+    ↓ (miss)
+Query Pinecone for similar context chunks
+    ↓
+Fetch Wikipedia summary via API
+    ↓
+Build prompt with article context + retrieved knowledge
+    ↓
+LLM generation (GPT-4o-mini for context, GPT-4o for follow-ups)
+    ↓
+Cache in Redis (TTL: 24h for entity context, 6h for LLM responses)
+    ↓
+Return to frontend
 ```
 
 ---
 
-## Environment Configuration
-
-### Required Environment Variables
+## Environment Variables
 
 ```bash
-# .env.example
+# Required
+OPENAI_API_KEY=sk-...            # GPT-4o-mini summaries + embeddings
+PINECONE_API_KEY=...             # Vector store
 
-# Database
-POSTGRES_URL=postgresql://user:pass@localhost:5432/minerva
-MONGODB_URL=mongodb://localhost:27017/minerva
-NEO4J_URL=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=password
+# Optional (defaults work for local dev)
+DATABASE_URL=sqlite+aiosqlite:///./minerva.db  # Auto-detected; use postgresql+asyncpg://... for Postgres
 REDIS_URL=redis://localhost:6379
+CORS_ORIGINS=["http://localhost:3000"]
+SENTRY_DSN=                      # Optional error tracking
 
-# Message Queue
-KAFKA_BOOTSTRAP_SERVERS=localhost:9092
-
-# Vector Store
-PINECONE_API_KEY=your-key
-PINECONE_ENVIRONMENT=us-east-1
-PINECONE_INDEX=minerva-entities
-
-# LLM
-ANTHROPIC_API_KEY=your-claude-key
-OPENAI_API_KEY=your-openai-key  # For embeddings
-
-# External APIs
-WIKIPEDIA_API_URL=https://en.wikipedia.org/w/api.php
-WIKIDATA_API_URL=https://www.wikidata.org/w/api.php
-
-# Service Config
-CONTEXT_SERVICE_PORT=8001
-USER_SERVICE_PORT=8002
-ARTICLES_SERVICE_PORT=8003
-ENVIRONMENT=development  # development | staging | production
-
-# Feature Flags
-ENABLE_USER_PROFILES=true
-ENABLE_CACHING=true
-LLM_PROVIDER=anthropic  # anthropic | openai | mistral
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ---
 
-## Local Development Setup
-
-### Prerequisites
-- Docker & Docker Compose
-- Python 3.11+
-- Node.js 20+
-- Make
-
-### Quick Start
+## Local Development Commands
 
 ```bash
-# Clone and setup
-git clone https://github.com/your-org/minerva.git
-cd minerva
-cp .env.example .env
+# Backend
+cd backend && poetry run uvicorn app.main:app --reload --port 8000
+cd backend && poetry run pytest -v
+cd backend && poetry run ruff check .
+cd backend && poetry run ruff format .
+cd backend && poetry run alembic upgrade head   # PostgreSQL only
 
-# Start infrastructure (databases, kafka, etc.)
-make infra-up
+# Frontend
+cd frontend && npm run dev          # Dev server on :3000
+cd frontend && npm run build        # Production build
+cd frontend && npm run lint         # ESLint
+cd frontend && npm run typecheck    # tsc --noEmit
 
-# Install dependencies
-make install
-
-# Run database migrations
-make migrate
-
-# Seed with sample data
-make seed
-
-# Start all services in development mode
-make dev
-
-# Or start individual services
-make dev-context      # Context service only
-make dev-extension    # Browser extension with hot reload
+# Makefile shortcuts
+make dev-backend     # uvicorn with reload
+make dev-frontend    # next dev
+make install         # poetry install + npm install
+make test            # pytest + npm test
+make lint            # ruff + eslint
+make migrate         # alembic upgrade head
+make seed            # seed sample data
 ```
 
-### Makefile Commands
+---
 
-```makefile
-# Development
-dev                 # Start all services
-dev-context         # Start context service
-dev-extension       # Start browser extension
-dev-dashboard       # Start web dashboard
+## Frontend Design System
 
-# Infrastructure
-infra-up            # Start Docker infrastructure
-infra-down          # Stop infrastructure
-infra-logs          # View infrastructure logs
+### Colors (CSS custom properties in `globals.css`)
 
-# Database
-migrate             # Run all migrations
-migrate-create      # Create new migration
-seed                # Seed development data
+**Light mode**: `--background: #FAFAFA`, `--foreground: #1A1A2E`, `--accent-primary: #0D1B3E` (deep navy)
+**Dark mode**: `--background: #0A0A14`, `--foreground: #EAEAF0`, `--accent-primary: #6B9FD4` (light blue)
 
-# Testing
-test                # Run all tests
-test-unit           # Unit tests only
-test-integration    # Integration tests
-test-e2e            # End-to-end tests
-test-coverage       # Generate coverage report
+**Entity type colors**: person=#4A7AB5, organization=#7A5AB5, event=#B5764A, concept=#4AB58A, location=#B54A6E
 
-# Code Quality
-lint                # Run linters
-format              # Format code
-typecheck           # Run type checking
+### Typography
+- **Poppins**: h1-h4, buttons, labels, navigation (weights: 400, 500, 600, 800)
+- **Roboto**: body text, paragraphs, inputs (weights: 400, 500)
 
-# Build & Deploy
-build               # Build all services
-build-extension     # Build browser extension
-deploy-staging      # Deploy to staging
-deploy-prod         # Deploy to production (requires approval)
-
-# Utilities
-logs                # View service logs
-shell-context       # Shell into context service
-shell-db            # Connect to PostgreSQL
-clean               # Clean build artifacts
-```
+### Key UI Patterns
+- Mobile-first: `max-w-[393px] mx-auto` container
+- Entity highlighting: gold background (`--entity-highlight: #F5E6C8`) + accent-secondary border
+- Bottom sheet: framer-motion spring animation (damping: 25, stiffness: 300)
+- Category chips: filled (active) vs outlined (inactive)
+- Article cards: hero (400px), standard (180px), compact (72x72 thumb)
 
 ---
 
 ## Deployment
 
-### Staging Deployment
-
-Triggered automatically on merge to `staging` branch.
-
-```bash
-# Manual staging deploy
-make deploy-staging
-```
-
-### Production Deployment
-
-Requires:
-1. All tests passing
-2. Staging verification
-3. Manual approval in GitHub Actions
+- **Frontend**: Deployed on Vercel at `frontend-roan-nine-nf5erh3avr.vercel.app`
+- **Backend**: Run locally or via Docker. Set `NEXT_PUBLIC_API_URL` on Vercel to connect.
 
 ```bash
-# Create release
-git tag -a v1.0.0 -m "Release 1.0.0"
-git push origin v1.0.0
+# Deploy frontend to Vercel
+cd frontend && vercel --prod --token $VERCEL_TOKEN
 
-# This triggers production deployment workflow
-```
-
-### Infrastructure Provisioning
-
-```bash
-cd infrastructure/terraform/environments/staging
-
-# Initialize
-terraform init
-
-# Plan changes
-terraform plan -out=tfplan
-
-# Apply
-terraform apply tfplan
+# Docker infrastructure (Postgres + Redis)
+docker-compose up -d
 ```
 
 ---
 
-## Key Implementation Notes
+## Performance Targets
 
-### Context Generation Pipeline
-
-```
-User taps term
-      │
-      ▼
-┌─────────────────┐
-│ Check Redis     │──hit──▶ Return cached response
-│ Cache           │
-└────────┬────────┘
-         │ miss
-         ▼
-┌─────────────────┐
-│ Query Knowledge │──▶ Neo4j: entity info, relationships
-│ Graph           │──▶ Get connected articles
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ RAG Retrieval   │──▶ Pinecone: similar context chunks
-│                 │──▶ Wikipedia API: current info
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Get User        │──▶ Redis: knowledge profile
-│ Profile         │──▶ Determine explanation depth
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ LLM Generation  │──▶ Claude API with retrieved context
-│                 │──▶ Prompt includes user's knowledge level
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Cache & Return  │──▶ Store in Redis (TTL: 1 hour)
-│                 │──▶ Update user profile (async)
-└─────────────────┘
-```
-
-### Prompt Template (Context Generation)
-
-```python
-CONTEXT_PROMPT = """You are Minerva, an AI assistant that provides concise, contextual explanations for news readers.
-
-TERM TO EXPLAIN: {term}
-ARTICLE CONTEXT: {surrounding_text}
-ARTICLE SOURCE: {article_source}
-
-RETRIEVED KNOWLEDGE:
-{retrieved_context}
-
-USER KNOWLEDGE LEVEL: {knowledge_level}  # novice | intermediate | expert
-
-INSTRUCTIONS:
-1. Explain "{term}" in a way that helps understand the article
-2. Be concise - {depth_instruction}
-3. Focus on relevance to the current news context
-4. Include only essential background, not exhaustive history
-5. If the term relates to ongoing events, prioritize recent context
-
-Provide your explanation in 1-3 sentences unless the user's knowledge level requires more depth.
-
-EXPLANATION:"""
-```
-
-### Performance Targets
-
-| Metric | Target | Critical |
-|--------|--------|----------|
-| Context API p50 latency | <300ms | <500ms |
-| Context API p95 latency | <500ms | <1000ms |
-| Entity extraction throughput | 100 articles/min | 50 articles/min |
-| Cache hit rate | >60% | >40% |
-| LLM cost per context | <$0.002 | <$0.005 |
+| Metric | Target |
+|--------|--------|
+| Context API p50 latency | <300ms |
+| Context API p95 latency | <500ms |
+| Cache hit rate | >60% |
+| LLM cost per context | <$0.002 |
 
 ---
 
-## Monitoring & Alerts
-
-### Key Metrics to Track
-
-```yaml
-# Business Metrics
-- context_requests_total
-- context_requests_by_term_type (person, org, event, concept)
-- unique_users_daily
-- contexts_per_user_session
-
-# Performance Metrics  
-- context_latency_seconds (histogram)
-- cache_hit_rate
-- llm_latency_seconds
-- rag_retrieval_latency_seconds
-
-# Error Metrics
-- context_errors_total (by error_type)
-- llm_rate_limit_hits
-- entity_extraction_failures
-
-# Infrastructure
-- service_up (by service)
-- database_connections_active
-- kafka_consumer_lag
-```
-
-### Alert Thresholds
-
-```yaml
-critical:
-  - context_api_error_rate > 5% for 5m
-  - context_p95_latency > 2s for 5m
-  - any service_up == 0
-
-warning:
-  - context_api_error_rate > 1% for 10m
-  - cache_hit_rate < 40% for 30m
-  - kafka_consumer_lag > 10000
-```
-
----
-
-## Security Considerations
-
-1. **API Authentication**: JWT tokens for user-facing APIs
-2. **Rate Limiting**: 100 requests/min for free tier, 1000 for paid
-3. **Data Privacy**: User profiles stored with encryption at rest
-4. **LLM Safety**: Input sanitization before LLM calls
-5. **CORS**: Strict origin allowlist for browser extension
-
----
-
-## Phase 1 MVP Scope (4 weeks)
-
-**In Scope**:
-- [ ] Context Service with basic RAG (Wikipedia + Wikidata)
-- [ ] Chrome extension with term highlighting and popup
-- [ ] Basic entity extraction (spaCy out-of-box)
-- [ ] Redis caching for frequently requested terms
-- [ ] User authentication (simple JWT)
-
-**Out of Scope for MVP**:
-- User knowledge profiles (adaptive depth)
-- Publisher integrations
-- Mobile apps
-- Fine-tuned NER model
-- Neo4j knowledge graph (use direct API calls initially)
-
----
-
-## Commands for Claude Code
-
-When working on this project, prefer these patterns:
-
-```bash
-# Starting a new service
-cd services && mkdir new-service && cd new-service
-# Create Dockerfile, pyproject.toml, src/ structure
-
-# Running locally
-docker-compose up -d postgres redis kafka
-cd services/context-service && uvicorn src.main:app --reload
-
-# Testing
-pytest services/context-service/tests -v
-
-# Database migrations
-alembic revision --autogenerate -m "description"
-alembic upgrade head
-
-# Building extension
-cd clients/browser-extension && pnpm dev
-
-# Deploying
-git push origin staging  # Auto-deploys to staging
-```
-
----
-
-## Resources & References
-
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Plasmo Browser Extension Framework](https://docs.plasmo.com/)
-- [spaCy NER Guide](https://spacy.io/usage/linguistic-features#named-entities)
-- [LangChain RAG Patterns](https://python.langchain.com/docs/use_cases/question_answering/)
-- [Claude API Documentation](https://docs.anthropic.com/)
-
----
-
-*Last Updated: January 2026*
-*Maintainer: Minerva Engineering Team*
+*Last Updated: February 2026*
