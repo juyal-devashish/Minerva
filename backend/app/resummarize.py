@@ -24,9 +24,7 @@ async def main() -> None:
 
     async with async_session() as db:
         # Find articles with placeholder summaries
-        result = await db.execute(
-            select(Article).where(Article.summary.like(f"{PLACEHOLDER}%"))
-        )
+        result = await db.execute(select(Article).where(Article.summary.like(f"{PLACEHOLDER}%")))
         articles = result.scalars().all()
         total = len(articles)
         logger.info(f"Found {total} articles to re-summarize")

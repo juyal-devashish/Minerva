@@ -72,9 +72,7 @@ class ContextService:
             )
 
             # Search for related articles via embeddings
-            await self.embedding_service.search(
-                entity.canonical_name, top_k=3
-            )
+            await self.embedding_service.search(entity.canonical_name, top_k=3)
 
             # Build prompt and call LLM
             prompt = PROMPTS["entity_context"]["v1"]["template"].format(
@@ -174,14 +172,10 @@ class ContextService:
             confidence=0.85,
         )
 
-    async def _get_related_entities(
-        self, entity: Entity, db: AsyncSession
-    ) -> list[RelatedEntity]:
+    async def _get_related_entities(self, entity: Entity, db: AsyncSession) -> list[RelatedEntity]:
         """Find other entities that appear in the same articles."""
         # Get articles containing this entity
-        article_ids_q = select(ArticleEntity.article_id).where(
-            ArticleEntity.entity_id == entity.id
-        )
+        article_ids_q = select(ArticleEntity.article_id).where(ArticleEntity.entity_id == entity.id)
 
         # Get other entities from those articles
         related_q = (

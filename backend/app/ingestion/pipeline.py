@@ -68,9 +68,7 @@ class IngestionPipeline:
     async def _ensure_sources(self, db: AsyncSession) -> None:
         """Create source records if they don't exist."""
         for src in NEWS_SOURCES:
-            result = await db.execute(
-                select(Source).where(Source.feed_url == src["url"])
-            )
+            result = await db.execute(select(Source).where(Source.feed_url == src["url"]))
             if not result.scalar_one_or_none():
                 db.add(
                     Source(
@@ -93,9 +91,7 @@ class IngestionPipeline:
                 continue
 
             # Check if URL already exists
-            existing = await db.execute(
-                select(Article).where(Article.url == article_data.url)
-            )
+            existing = await db.execute(select(Article).where(Article.url == article_data.url))
             if existing.scalar_one_or_none():
                 continue
 
@@ -117,9 +113,7 @@ class IngestionPipeline:
 
         return processed
 
-    async def _process_article(
-        self, article_data, source_config: dict, db: AsyncSession
-    ) -> None:
+    async def _process_article(self, article_data, source_config: dict, db: AsyncSession) -> None:
         """Process a single article through the full pipeline."""
         # Get source
         source_result = await db.execute(

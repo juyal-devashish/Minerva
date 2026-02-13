@@ -233,8 +233,7 @@ ENTITIES_BY_ARTICLE = [
             "wikidata_id": "Q1967952",
             "wikipedia_url": "https://en.wikipedia.org/wiki/National_Symphony_Orchestra_(United_States)",
             "short_context": (
-                "Major American orchestra based at the"
-                " Kennedy Center in Washington D.C."
+                "Major American orchestra based at the Kennedy Center in Washington D.C."
             ),
             "popularity_score": 50,
             "mention_text": "National Symphony Orchestra",
@@ -248,8 +247,7 @@ ENTITIES_BY_ARTICLE = [
             "wikidata_id": "Q180278",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Yo-Yo_Ma",
             "short_context": (
-                "French-born American cellist, considered one"
-                " of the greatest cellists of all time."
+                "French-born American cellist, considered one of the greatest cellists of all time."
             ),
             "popularity_score": 80,
             "mention_text": "Yo-Yo Ma",
@@ -266,8 +264,7 @@ ENTITIES_BY_ARTICLE = [
             "wikidata_id": "Q21708200",
             "wikipedia_url": "https://en.wikipedia.org/wiki/OpenAI",
             "short_context": (
-                "AI research company that created ChatGPT"
-                " and the GPT series of language models."
+                "AI research company that created ChatGPT and the GPT series of language models."
             ),
             "popularity_score": 95,
             "mention_text": "OpenAI",
@@ -338,8 +335,7 @@ ENTITIES_BY_ARTICLE = [
             "wikidata_id": "Q6178961",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Jerome_Powell",
             "short_context": (
-                "Chair of the Federal Reserve since 2018,"
-                " overseeing U.S. monetary policy."
+                "Chair of the Federal Reserve since 2018, overseeing U.S. monetary policy."
             ),
             "popularity_score": 85,
             "mention_text": "Jerome Powell",
@@ -368,8 +364,7 @@ ENTITIES_BY_ARTICLE = [
             "wikidata_id": "Q182692",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Christine_Lagarde",
             "short_context": (
-                "President of the European Central Bank"
-                " since 2019, former head of the IMF."
+                "President of the European Central Bank since 2019, former head of the IMF."
             ),
             "popularity_score": 75,
             "mention_text": "Christine Lagarde",

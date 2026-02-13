@@ -8,6 +8,7 @@ from sqlalchemy.types import JSON
 from app.database import IS_SQLITE
 
 if IS_SQLITE:
+
     class GUID(TypeDecorator):
         """UUID stored as string in SQLite."""
 
@@ -41,4 +42,5 @@ def uuid_array():
         return JSON
     from sqlalchemy.dialects.postgresql import ARRAY
     from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+
     return ARRAY(PG_UUID(as_uuid=True))

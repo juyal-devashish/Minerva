@@ -38,6 +38,7 @@ class NERService:
         """Lazy-load spaCy model."""
         if self._nlp is None:
             import spacy
+
             try:
                 self._nlp = spacy.load("en_core_web_trf")
             except OSError:

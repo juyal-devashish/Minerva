@@ -20,9 +20,7 @@ class RateLimiter:
     def __init__(self) -> None:
         self.redis = redis.from_url(settings.redis_url, decode_responses=True)
 
-    async def check_limit(
-        self, identifier: str, limit_type: str
-    ) -> tuple[bool, int]:
+    async def check_limit(self, identifier: str, limit_type: str) -> tuple[bool, int]:
         """Check if a request is within rate limits.
 
         Args:
