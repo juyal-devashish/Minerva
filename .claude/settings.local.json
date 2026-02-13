@@ -27,7 +27,8 @@
       "WebFetch(domain:frontend-roan-nine-nf5erh3avr.vercel.app)",
       "WebFetch(domain:frontend-5p4qlsi9h-devashish-juyals-projects.vercel.app)",
       "Bash(/opt/homebrew/opt/python@3.12/bin/python3.12:*)",
-      "Bash(pip3 show:*)"
+      "Bash(pip3 show:*)",
+      "Bash(poetry run ruff check:*)"
     ]
   }
 }

@@ -31,7 +31,10 @@ async def get_feed(
         if IS_SQLITE:
             # JSON array stored as text in SQLite — use json_each or LIKE
             query = query.where(
-                text("EXISTS (SELECT 1 FROM json_each(articles.categories) WHERE json_each.value = :cat)")
+                text(
+                    "EXISTS (SELECT 1 FROM json_each(articles.categories)"
+                    " WHERE json_each.value = :cat)"
+                )
             ).params(cat=category)
         else:
             query = query.where(Article.categories.contains([category]))

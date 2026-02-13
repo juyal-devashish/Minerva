@@ -72,7 +72,7 @@ class ContextService:
             )
 
             # Search for related articles via embeddings
-            related_results_for_prompt = await self.embedding_service.search(
+            await self.embedding_service.search(
                 entity.canonical_name, top_k=3
             )
 
@@ -154,7 +154,9 @@ class ContextService:
             retrieved_knowledge=wikipedia_extract or "",
         )
 
-        answer = await self.llm.generate(prompt, model="gpt-4o-mini", max_tokens=500, temperature=0.4)
+        answer = await self.llm.generate(
+            prompt, model="gpt-4o-mini", max_tokens=500, temperature=0.4
+        )
 
         return ExplainResponse(
             entity=EntityInfo(

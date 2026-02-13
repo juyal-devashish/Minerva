@@ -9,7 +9,6 @@ from app.models.article import Article
 from app.models.entity import ArticleEntity, Entity
 from app.models.source import Source
 
-
 SOURCES = [
     {
         "name": "The New York Times",
@@ -81,9 +80,9 @@ ARTICLES = [
             "OpenAI has officially unveiled GPT-5, its most advanced large language model to date, "
             "claiming significant breakthroughs in multi-step reasoning and factual accuracy. CEO "
             "Sam Altman presented the model at a press event in San Francisco.\n\n"
-            "The new model reportedly scores 92% on graduate-level science benchmarks, up from "
-            "GPT-4's 78%. Altman described it as 'the first model that can genuinely reason through "
-            "complex problems rather than pattern-matching.'\n\n"
+            "The new model reportedly scores 92% on graduate-level science benchmarks, "
+            "up from GPT-4's 78%. Altman described it as 'the first model that can genuinely "
+            "reason through complex problems rather than pattern-matching.'\n\n"
             "Competitors including Google DeepMind and Anthropic have been racing to develop "
             "similar capabilities. Google's Gemini Ultra 2 and Anthropic's Claude have both shown "
             "improvements in reasoning, but OpenAI claims GPT-5 sets a new bar.\n\n"
@@ -94,9 +93,9 @@ ARTICLES = [
             "OpenAI has officially unveiled GPT-5, its most advanced large language model to date, "
             "claiming significant breakthroughs in multi-step reasoning and factual accuracy. CEO "
             "Sam Altman presented the model at a press event in San Francisco.\n\n"
-            "The new model reportedly scores 92% on graduate-level science benchmarks, up from "
-            "GPT-4's 78%. Altman described it as 'the first model that can genuinely reason through "
-            "complex problems rather than pattern-matching.'\n\n"
+            "The new model reportedly scores 92% on graduate-level science benchmarks, "
+            "up from GPT-4's 78%. Altman described it as 'the first model that can genuinely "
+            "reason through complex problems rather than pattern-matching.'\n\n"
             "Competitors including Google DeepMind and Anthropic have been racing to develop "
             "similar capabilities. Google's Gemini Ultra 2 and Anthropic's Claude have both shown "
             "improvements in reasoning, but OpenAI claims GPT-5 sets a new bar.\n\n"
@@ -203,7 +202,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "PERSON",
             "wikidata_id": "Q189729",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Philip_Glass",
-            "short_context": "American composer known for minimalist music, including operas, symphonies, and film scores.",
+            "short_context": (
+                "American composer known for minimalist music,"
+                " including operas, symphonies, and film scores."
+            ),
             "popularity_score": 85,
             "mention_text": "Philip Glass",
             "start_position": 0,
@@ -215,7 +217,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "ORG",
             "wikidata_id": "Q631289",
             "wikipedia_url": "https://en.wikipedia.org/wiki/John_F._Kennedy_Center_for_the_Performing_Arts",
-            "short_context": "The nation's premier performing arts center in Washington D.C., named after President John F. Kennedy.",
+            "short_context": (
+                "The nation's premier performing arts center in"
+                " Washington D.C., named after President John F. Kennedy."
+            ),
             "popularity_score": 75,
             "mention_text": "Kennedy Center",
             "start_position": 92,
@@ -227,7 +232,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "ORG",
             "wikidata_id": "Q1967952",
             "wikipedia_url": "https://en.wikipedia.org/wiki/National_Symphony_Orchestra_(United_States)",
-            "short_context": "Major American orchestra based at the Kennedy Center in Washington D.C.",
+            "short_context": (
+                "Major American orchestra based at the"
+                " Kennedy Center in Washington D.C."
+            ),
             "popularity_score": 50,
             "mention_text": "National Symphony Orchestra",
             "start_position": 597,
@@ -239,7 +247,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "PERSON",
             "wikidata_id": "Q180278",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Yo-Yo_Ma",
-            "short_context": "French-born American cellist, considered one of the greatest cellists of all time.",
+            "short_context": (
+                "French-born American cellist, considered one"
+                " of the greatest cellists of all time."
+            ),
             "popularity_score": 80,
             "mention_text": "Yo-Yo Ma",
             "start_position": 730,
@@ -254,7 +265,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "ORG",
             "wikidata_id": "Q21708200",
             "wikipedia_url": "https://en.wikipedia.org/wiki/OpenAI",
-            "short_context": "AI research company that created ChatGPT and the GPT series of language models.",
+            "short_context": (
+                "AI research company that created ChatGPT"
+                " and the GPT series of language models."
+            ),
             "popularity_score": 95,
             "mention_text": "OpenAI",
             "start_position": 0,
@@ -290,7 +304,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "ORG",
             "wikidata_id": "Q107096030",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Anthropic",
-            "short_context": "AI safety company founded by former OpenAI members, creator of the Claude AI assistant.",
+            "short_context": (
+                "AI safety company founded by former OpenAI"
+                " members, creator of the Claude AI assistant."
+            ),
             "popularity_score": 80,
             "mention_text": "Anthropic",
             "start_position": 439,
@@ -305,7 +322,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "ORG",
             "wikidata_id": "Q53536",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Federal_Reserve",
-            "short_context": "The central bank of the United States, responsible for monetary policy and interest rates.",
+            "short_context": (
+                "The central bank of the United States,"
+                " responsible for monetary policy and interest rates."
+            ),
             "popularity_score": 90,
             "mention_text": "Federal Reserve",
             "start_position": 4,
@@ -317,7 +337,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "PERSON",
             "wikidata_id": "Q6178961",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Jerome_Powell",
-            "short_context": "Chair of the Federal Reserve since 2018, overseeing U.S. monetary policy.",
+            "short_context": (
+                "Chair of the Federal Reserve since 2018,"
+                " overseeing U.S. monetary policy."
+            ),
             "popularity_score": 85,
             "mention_text": "Jerome Powell",
             "start_position": 133,
@@ -329,7 +352,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "MISC",
             "wikidata_id": "Q199316",
             "wikipedia_url": "https://en.wikipedia.org/wiki/S%26P_500",
-            "short_context": "A stock market index tracking 500 of the largest U.S. public companies, widely used as a market benchmark.",
+            "short_context": (
+                "A stock market index tracking 500 of the largest"
+                " U.S. public companies, widely used as a market benchmark."
+            ),
             "popularity_score": 70,
             "mention_text": "S&P 500",
             "start_position": 440,
@@ -341,7 +367,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "PERSON",
             "wikidata_id": "Q182692",
             "wikipedia_url": "https://en.wikipedia.org/wiki/Christine_Lagarde",
-            "short_context": "President of the European Central Bank since 2019, former head of the IMF.",
+            "short_context": (
+                "President of the European Central Bank"
+                " since 2019, former head of the IMF."
+            ),
             "popularity_score": 75,
             "mention_text": "Christine Lagarde",
             "start_position": 617,
@@ -356,7 +385,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "ORG",
             "wikidata_id": "Q23548",
             "wikipedia_url": "https://en.wikipedia.org/wiki/NASA",
-            "short_context": "The U.S. federal agency responsible for space exploration and aeronautics research.",
+            "short_context": (
+                "The U.S. federal agency responsible for"
+                " space exploration and aeronautics research."
+            ),
             "popularity_score": 95,
             "mention_text": "NASA",
             "start_position": 0,
@@ -368,7 +400,10 @@ ENTITIES_BY_ARTICLE = [
             "entity_type": "ORG",
             "wikidata_id": "Q193701",
             "wikipedia_url": "https://en.wikipedia.org/wiki/SpaceX",
-            "short_context": "Private aerospace company founded by Elon Musk, developing rockets and the Starship vehicle.",
+            "short_context": (
+                "Private aerospace company founded by Elon Musk,"
+                " developing rockets and the Starship vehicle."
+            ),
             "popularity_score": 90,
             "mention_text": "SpaceX",
             "start_position": 123,
@@ -410,7 +445,7 @@ async def seed() -> None:
 
     async with async_session() as session:
         # Check if already seeded
-        from sqlalchemy import select, func
+        from sqlalchemy import func, select
 
         count = (await session.execute(select(func.count()).select_from(Article))).scalar_one()
         if count > 0:
@@ -490,7 +525,8 @@ async def seed() -> None:
                 session.add(ae)
 
         await session.commit()
-        print(f"Seeded {len(ARTICLES)} articles, {sum(len(e) for e in ENTITIES_BY_ARTICLE)} entity mentions.")
+        entity_count = sum(len(e) for e in ENTITIES_BY_ARTICLE)
+        print(f"Seeded {len(ARTICLES)} articles, {entity_count} entity mentions.")
 
 
 if __name__ == "__main__":
