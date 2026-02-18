@@ -11,16 +11,20 @@ from app.routers import articles, context, feed, search
 
 logger = logging.getLogger(__name__)
 
+try:
+    if settings.sentry_dsn and settings.sentry_dsn != "xxx":
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            environment=settings.environment,
+            send_default_pii=True,
+        )
+except Exception as e:
+    logger.warning(f"Sentry initialization failed: {e}")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Manage application startup and shutdown."""
-    # Startup
-    try:
-        if settings.sentry_dsn and settings.sentry_dsn != "xxx":
-            sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment)
-    except Exception as e:
-        logger.warning(f"Sentry initialization failed: {e}")
 
     # Create tables for SQLite (no Alembic needed locally)
     from app.database import IS_SQLITE, create_tables
