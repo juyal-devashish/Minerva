@@ -1,3 +1,4 @@
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -8,13 +9,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.routers import articles, context, feed, search
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Manage application startup and shutdown."""
     # Startup
-    if settings.sentry_dsn:
-        sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment)
+    try:
+        if settings.sentry_dsn and settings.sentry_dsn != "xxx":
+            sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment)
+    except Exception as e:
+        logger.warning(f"Sentry initialization failed: {e}")
 
     # Create tables for SQLite (no Alembic needed locally)
     from app.database import IS_SQLITE, create_tables
