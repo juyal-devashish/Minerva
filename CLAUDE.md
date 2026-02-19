@@ -33,7 +33,7 @@ PostgreSQL / SQLite  ·  Redis  ·  Pinecone  ·  OpenAI API
 - **Cache**: Redis 7 (production via Upstash, local via Docker)
 - **Vectors**: Pinecone (article embeddings for semantic search + RAG)
 - **Scheduler**: APScheduler (hourly ingestion pipeline)
-- **Error tracking**: Sentry (optional)
+- **Error tracking**: Sentry (optional, initialized at module level before app creation)
 
 ### Frontend (`frontend/`)
 - **Framework**: Next.js 14 (App Router)
@@ -104,17 +104,21 @@ minerva/
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── layout.tsx           # Root layout (Poppins + Roboto fonts)
-│   │   │   ├── page.tsx             # Tab-based SPA: Feed, Search, Bookmarks, Trending, Profile
+│   │   │   ├── page.tsx             # Tab-based SPA with SwipeableHome landing (CardSwiper ↔ FeedList)
 │   │   │   ├── providers.tsx        # React Query provider
 │   │   │   ├── article/[id]/
 │   │   │   │   ├── page.tsx         # Article detail route
 │   │   │   │   └── reference/page.tsx  # Reference page route
 │   │   │   └── search/page.tsx      # Search route (unused, SPA tab used instead)
 │   │   ├── components/
+│   │   │   ├── SplashScreen.tsx     # Animated splash (text → logo → fade out)
 │   │   │   ├── feed/
+│   │   │   │   ├── SwipeableHome.tsx # Horizontal swipe: CardSwiper ↔ FeedList
+│   │   │   │   ├── CardSwiper.tsx   # Full-page vertical scroll-snap swiper + entity detail fetch + ContextPopup
+│   │   │   │   ├── FullPageCard.tsx  # Full-screen card with inline entity highlights on summary
 │   │   │   │   ├── ArticleCard.tsx  # 3 variants: hero, standard, compact
 │   │   │   │   ├── CategoryTabs.tsx # Chip-style category filter
-│   │   │   │   └── FeedList.tsx     # Feed layout (hero first + standard rest)
+│   │   │   │   └── FeedList.tsx     # Traditional feed (hero first + standard rest)
 │   │   │   ├── article/
 │   │   │   │   ├── ArticleView.tsx      # Full article with scroll progress, hero image
 │   │   │   │   ├── ArticleContent.tsx   # Content wrapper
@@ -151,18 +155,19 @@ minerva/
 │   │   ├── lib/
 │   │   │   ├── api.ts              # Fetch wrapper (all API calls)
 │   │   │   ├── queryClient.ts      # React Query client config
-│   │   │   └── utils.ts            # cn() utility
+│   │   │   └── utils.ts            # cn() utility + formatTimeAgo()
 │   │   ├── types/index.ts          # All TypeScript interfaces
 │   │   └── styles/globals.css      # Figma design tokens (light + dark mode)
 │   ├── tailwind.config.js          # Hex-based color tokens
 │   ├── tsconfig.json               # strict: true
 │   └── package.json
 │
+├── src-2/                      # New design reference (full-page card swiper prototype)
 ├── figma_src/                  # Figma design reference components
 ├── docker-compose.yml          # PostgreSQL 15 + Redis 7 (local dev)
 ├── Makefile                    # Common dev commands
 ├── .env.example                # Environment template
-└── .github/workflows/          # CI + deploy workflows
+└── .github/workflows/          # CI (ci.yml) + deploy to Railway (deploy.yml)
 ```
 
 ---
@@ -323,10 +328,15 @@ make seed            # seed sample data
 
 ### Key UI Patterns
 - Mobile-first: `max-w-[393px] mx-auto` container
-- Entity highlighting: gold background (`--entity-highlight: #F5E6C8`) + accent-secondary border
+- **Splash screen**: Animated intro — "Minerva" text (phase 0) → owl logo + "News, understood" tagline (phase 1) → fade out (phase 2)
+- **Landing page**: Full-page card swiper (CardSwiper) with vertical scroll-snap — default view on app open
+- **Swipeable feed**: Horizontal swipe (react-swipeable) toggles between CardSwiper (default) and traditional FeedList
+- **View indicator**: Bottom dots show which view is active (card swiper vs feed list)
+- **Card-level entity highlights**: Summary text on FullPageCard has inline entity highlighting via text-matching (entities fetched from article detail API). Tap opens ContextPopup directly from card — no need to enter article detail view
+- Entity highlighting: gold background (`--entity-highlight: #F5E6C8`) + entity-type-colored borders (person=#4A7AB5, org=#7A5AB5, event=#B5764A, concept=#4AB58A, location=#B54A6E)
 - Bottom sheet: framer-motion spring animation (damping: 25, stiffness: 300)
 - Category chips: filled (active) vs outlined (inactive)
-- Article cards: hero (400px), standard (180px), compact (72x72 thumb)
+- Article cards: full-page (card swiper, 35% image), hero (400px), standard (180px), compact (72x72 thumb)
 
 ---
 

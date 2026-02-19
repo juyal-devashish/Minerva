@@ -142,7 +142,8 @@ minerva/
 │       │   ├── providers.tsx    # React Query provider
 │       │   └── article/[id]/   # Article detail + reference routes
 │       ├── components/
-│       │   ├── feed/            # ArticleCard, CategoryTabs, FeedList
+│       │   ├── SplashScreen.tsx  # Animated splash (text → logo → fade)
+│       │   ├── feed/            # FullPageCard, CardSwiper, SwipeableHome, ArticleCard, FeedList, CategoryTabs
 │       │   ├── article/         # ArticleView, EntityHighlight, HighlightedText
 │       │   ├── context/         # ContextPopup (animated bottom sheet)
 │       │   ├── reference/       # ReferencePage (grouped entities)
@@ -188,12 +189,17 @@ Fetch (RSS) → Dedup (MinHash) → Clean (HTML strip) → NER (spaCy en_core_we
 
 Mobile-first design (393px) with Figma-matched design system:
 
+- **Splash screen**: Animated intro — "Minerva" text → owl logo + tagline → fade to app
+- **Landing page**: Full-page card swiper (TikTok-style vertical scroll snap) — the default view on app open
+- **Traditional feed**: Hero card + scrollable list — accessible by swiping right from the card swiper
+- **Horizontal swipe**: `react-swipeable` + Framer Motion transitions between card swiper and feed list views
+- **Entity highlights on cards**: Entities in article summaries are highlighted directly on full-page cards with type-colored borders — tap to open context popup without entering article detail
 - **Typography**: Poppins (headings/UI) + Roboto (body)
 - **Colors**: Hex-based CSS custom properties with light/dark mode
 - **Navigation**: Bottom tab bar (Feed, Search, Bookmarks, Trending, Profile)
-- **Article cards**: Hero (full-width), Standard (with image), Compact (thumbnail)
-- **Entity highlighting**: Gold underlines with priority-based styling
-- **Context popup**: Animated bottom sheet (Framer Motion spring animation)
+- **Article cards**: FullPage (card swiper), Hero (full-width), Standard (with image), Compact (thumbnail)
+- **Entity highlighting**: Gold background with entity-type-colored borders (person=blue, org=purple, event=orange, concept=green, location=pink)
+- **Context popup**: Animated bottom sheet (Framer Motion spring animation) — accessible from both card swiper and article detail
 - **Onboarding**: 3-step flow with category selection
 - **Dark mode**: Toggle in Profile, persisted to localStorage
 

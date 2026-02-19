@@ -16,10 +16,12 @@ export interface Article {
   summary: string;
   source: string;
   sourceFavicon: string;
+  author: string;
   timeAgo: string;
   readTime: string;
   category: string;
   image: string;
+  imageCredit?: string;
   entities: ArticleEntity[];
   content: string; // Full article content with entity markers
 }
@@ -28,13 +30,15 @@ export const mockArticles: Article[] = [
   {
     id: '1',
     title: 'OpenAI Unveils GPT-5 with Revolutionary Reasoning Capabilities',
-    summary: 'The latest model shows unprecedented performance in complex problem-solving and multi-step reasoning tasks.',
+    summary: 'OpenAI today announced the release of GPT-5, marking a significant milestone in artificial intelligence development. The new model demonstrates unprecedented capabilities in complex reasoning and multi-step problem solving, outperforming its predecessor by 40% on reasoning benchmarks.',
     source: 'TechCrunch',
     sourceFavicon: '🔵',
+    author: 'Sarah Chen',
     timeAgo: '2h ago',
     readTime: '4 min read',
     category: 'Technology',
     image: 'https://images.unsplash.com/photo-1625314887424-9f190599bd56?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwcm9ib3R8ZW58MXx8fHwxNzcwNTY0OTU5fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageCredit: 'TechCrunch',
     entities: [
       {
         id: 'e1',
@@ -69,13 +73,15 @@ export const mockArticles: Article[] = [
   {
     id: '2',
     title: 'Federal Reserve Signals Potential Rate Cuts Amid Economic Uncertainty',
-    summary: 'Chair Powell hints at policy shift as inflation shows signs of cooling and growth concerns mount.',
+    summary: 'Chair Powell hints at policy shift as inflation shows signs of cooling and growth concerns mount. In testimony before Congress, Powell noted that inflation has shown consistent signs of cooling, approaching the Fed\'s 2% target. However, he emphasized that the Federal Reserve remains data-dependent.',
     source: 'Reuters',
     sourceFavicon: '🔴',
+    author: 'Michael Torres',
     timeAgo: '4h ago',
     readTime: '5 min read',
-    category: 'Business',
+    category: 'Finance',
     image: 'https://images.unsplash.com/photo-1766218329569-53c9270bb305?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaW5hbmNpYWwlMjBtYXJrZXRzJTIwZWNvbm9teXxlbnwxfHx8fDE3NzA1ODc5NDd8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageCredit: 'Reuters',
     entities: [
       {
         id: 'e4',
@@ -101,13 +107,15 @@ export const mockArticles: Article[] = [
   {
     id: '3',
     title: 'Major Climate Summit Reaches Historic Agreement on Carbon Emissions',
-    summary: '190 nations commit to unprecedented emissions reductions, with binding targets for 2030.',
+    summary: '190 nations commit to unprecedented emissions reductions, with binding targets for 2030. The accord significantly strengthens global commitments to reduce carbon emissions, building upon the Paris Agreement with more aggressive targets and enforcement mechanisms.',
     source: 'BBC News',
     sourceFavicon: '🟠',
+    author: 'Emma Whitfield',
     timeAgo: '6h ago',
     readTime: '6 min read',
     category: 'World',
     image: 'https://images.unsplash.com/photo-1616443586071-cd1f0a65ef5e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjbGltYXRlJTIwZW52aXJvbm1lbnQlMjBuYXR1cmV8ZW58MXx8fHwxNzcwNTU5MzIxfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageCredit: 'BBC News',
     entities: [
       {
         id: 'e6',
@@ -133,13 +141,15 @@ export const mockArticles: Article[] = [
   {
     id: '4',
     title: 'Breakthrough in Cancer Treatment Shows 90% Success Rate in Clinical Trials',
-    summary: 'New immunotherapy approach demonstrates remarkable efficacy against multiple cancer types.',
+    summary: 'A revolutionary CAR-T therapy has shown unprecedented success in phase III clinical trials, with a 90% response rate across multiple cancer types. The treatment, which is expected to receive FDA approval within months, represents a major breakthrough in oncology.',
     source: 'Nature Medicine',
     sourceFavicon: '🟢',
+    author: 'Dr. Priya Sharma',
     timeAgo: '8h ago',
     readTime: '7 min read',
     category: 'Health',
     image: 'https://images.unsplash.com/photo-1768498950658-87ecfe232b59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZWFsdGhjYXJlJTIwbWVkaWNhbCUyMHNjaWVuY2V8ZW58MXx8fHwxNzcwNTg3OTQ3fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageCredit: 'Nature Medicine',
     entities: [
       {
         id: 'e8',
@@ -165,13 +175,15 @@ export const mockArticles: Article[] = [
   {
     id: '5',
     title: 'Tech Giants Face Antitrust Probe Over AI Market Dominance',
-    summary: 'EU launches investigation into potential monopolistic practices in artificial intelligence sector.',
+    summary: 'The European Commission has launched a formal antitrust investigation into major technology companies\' practices in the AI market. The probe, conducted under the Digital Markets Act, examines whether these companies are leveraging their existing market positions to unfairly dominate the emerging AI sector.',
     source: 'The Wall Street Journal',
     sourceFavicon: '⚫',
+    author: 'James Rodriguez',
     timeAgo: '10h ago',
     readTime: '5 min read',
     category: 'Technology',
     image: 'https://images.unsplash.com/photo-1758525588803-fc7dc8096ba1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjaXR5JTIwbmV3cyUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzcwNTg3OTQ0fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageCredit: 'WSJ',
     entities: [
       {
         id: 'e10',
@@ -197,13 +209,15 @@ export const mockArticles: Article[] = [
   {
     id: '6',
     title: 'Global Trade Summit Addresses Supply Chain Disruptions',
-    summary: 'Leaders from G20 nations propose coordinated response to ongoing logistics challenges.',
+    summary: 'The G20 trade summit concluded with a joint declaration outlining coordinated measures to address persistent supply chain disruptions affecting global commerce. Leaders from G20 nations proposed a coordinated response to ongoing logistics challenges.',
     source: 'Financial Times',
     sourceFavicon: '🟡',
+    author: 'Amara Osei',
     timeAgo: '12h ago',
     readTime: '4 min read',
-    category: 'Business',
+    category: 'Finance',
     image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMG1lZXRpbmclMjBjb25mZXJlbmNlfGVufDF8fHx8MTc3MDUyMjE2Mnww&ixlib=rb-4.1.0&q=80&w=1080',
+    imageCredit: 'FT',
     entities: [
       {
         id: 'e12',
@@ -220,11 +234,10 @@ export const mockArticles: Article[] = [
 ];
 
 export const categories = [
-  'All',
-  'Politics',
+  'My Feed',
   'Technology',
-  'Science',
-  'Business',
+  'Finance',
+  'World',
   'Health',
-  'World'
+  'Timelines'
 ];
