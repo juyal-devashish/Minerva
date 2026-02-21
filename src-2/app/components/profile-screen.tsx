@@ -11,7 +11,7 @@ export function ProfileScreen({ darkMode, onToggleDarkMode }: ProfileScreenProps
     { label: 'Reading preferences', hasChevron: true },
     { label: 'Dark mode', hasToggle: true, isOn: darkMode, onToggle: onToggleDarkMode },
     { label: 'Notification preferences', hasChevron: true },
-    { label: 'About Minerva', hasChevron: true },
+    { label: 'About samā4', hasChevron: true },
     { label: 'Sign out', hasChevron: true },
   ];
 
@@ -105,7 +105,7 @@ export function ProfileScreen({ darkMode, onToggleDarkMode }: ProfileScreenProps
               color: 'var(--text-tertiary)'
             }}
           >
-            Minerva v1.0.0
+            samā4 v1.0.0
           </p>
           <p
             className="mt-1"

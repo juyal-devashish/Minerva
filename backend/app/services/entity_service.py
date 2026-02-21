@@ -5,7 +5,7 @@ import httpx
 logger = logging.getLogger(__name__)
 
 # Wikimedia APIs require a User-Agent header
-_HEADERS = {"User-Agent": "Minerva/0.1 (https://github.com/minerva; minerva@example.com)"}
+_HEADERS = {"User-Agent": "sama4/0.1 (https://github.com/juyal-devashish/Minerva; sama4@example.com)"}
 
 
 class EntityService:

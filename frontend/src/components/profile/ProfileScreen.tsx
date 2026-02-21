@@ -20,7 +20,7 @@ export function ProfileScreen({
       onToggle: onToggleDarkMode,
     },
     { label: "Notification preferences", hasChevron: true },
-    { label: "About Minerva", hasChevron: true },
+    { label: "About samā4", hasChevron: true },
     { label: "Sign out", hasChevron: true },
   ];
 
@@ -130,7 +130,7 @@ export function ProfileScreen({
               color: "var(--text-tertiary)",
             }}
           >
-            Minerva v1.0.0
+            samā4 v1.0.0
           </p>
         </div>
       </div>

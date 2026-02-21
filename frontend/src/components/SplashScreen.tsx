@@ -47,7 +47,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                   color: "var(--foreground)",
                 }}
               >
-                Minerva
+                samā4
               </motion.h1>
             )}
 
@@ -65,8 +65,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 className="flex flex-col items-center gap-4"
               >
                 <img
-                  src="/minerva-logo.jpg"
-                  alt="Minerva"
+                  src="/sama4-logo.jpg"
+                  alt="samā4"
                   className="w-24 h-24 object-contain"
                 />
                 <span

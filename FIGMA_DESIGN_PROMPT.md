@@ -1,8 +1,8 @@
-# Minerva — Figma Design Prompt (MVP)
+# samā4 — Figma Design Prompt (MVP)
 
 ## Product Summary
 
-Minerva is an AI-powered contextual news reader. When users read news articles, unfamiliar names, organizations, events, and concepts are automatically highlighted. Tapping a highlight reveals an instant, AI-generated context card — like a smart Wikipedia overlay built into the reading experience.
+samā4 is an AI-powered contextual news reader. When users read news articles, unfamiliar names, organizations, events, and concepts are automatically highlighted. Tapping a highlight reveals an instant, AI-generated context card — like a smart Wikipedia overlay built into the reading experience.
 
 Think: "Genius annotations for the news."
 
@@ -32,7 +32,7 @@ Think: "Genius annotations for the news."
 **Route**: `/`
 
 **Layout**:
-- Top bar with Minerva logo/wordmark and a search icon
+- Top bar with samā4 logo/wordmark and a search icon
 - Horizontal scrollable category tabs (All, Politics, Technology, Science, Business, Health, World, etc.) — the active tab is visually distinct
 - Vertical scrolling list of article cards
 
@@ -174,6 +174,6 @@ Design these as reusable Figma components with variants:
 
 ---
 
-## What Makes Minerva Visually Unique
+## What Makes samā4 Visually Unique
 
 The key differentiator is the **entity highlighting + context cards**. The design should make this feel magical — like the article is alive with knowledge. When a user taps a highlighted name and gets an instant, perfectly relevant explanation, that's the "wow" moment. Everything else (feed, search, navigation) should be familiar and invisible so that this core interaction shines.

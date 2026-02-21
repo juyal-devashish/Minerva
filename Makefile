@@ -74,7 +74,7 @@ typecheck:
 build: build-backend build-frontend
 
 build-backend:
-	cd backend && docker build -t minerva-backend .
+	cd backend && docker build -t sama4-backend .
 
 build-frontend:
 	cd frontend && npm run build
@@ -91,4 +91,4 @@ logs:
 	docker-compose logs -f
 
 shell-db:
-	docker-compose exec postgres psql -U minerva -d minerva
+	docker-compose exec postgres psql -U sama4 -d sama4

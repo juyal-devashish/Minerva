@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* Minerva Color System - Light Mode */
+    /* samā4 Color System - Light Mode */
     --background: #FAFAFA;
     --background-secondary: #F2F0ED;
     --surface: #FFFFFF;
@@ -54,7 +54,7 @@
   }
 
   .dark {
-    /* Minerva Color System - Dark Mode */
+    /* samā4 Color System - Dark Mode */
     --background: #0A0A14;
     --background-secondary: #12142A;
     --surface: #1C1E36;

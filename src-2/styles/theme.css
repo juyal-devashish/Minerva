@@ -1,7 +1,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Minerva Color System - Light Mode */
+  /* samā4 Color System - Light Mode */
   --font-size: 16px;
   
   /* Backgrounds */
@@ -86,7 +86,7 @@
 }
 
 .dark {
-  /* Minerva Color System - Dark Mode */
+  /* samā4 Color System - Dark Mode */
   
   /* Backgrounds */
   --background: #0A0A14; /* Rich Black */
@@ -192,7 +192,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   
-  /* Minerva Custom Colors */
+  /* samā4 Custom Colors */
   --color-background-secondary: var(--background-secondary);
   --color-surface: var(--surface);
   --color-text-secondary: var(--text-secondary);

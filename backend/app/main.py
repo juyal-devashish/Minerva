@@ -46,7 +46,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="Minerva API",
+    title="samā4 API",
     description="AI-powered contextual news intelligence platform",
     version="0.1.0",
     lifespan=lifespan,

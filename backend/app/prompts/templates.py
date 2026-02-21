@@ -3,7 +3,7 @@ PROMPTS = {
         "v1": {
             "active": True,
             "model": "gpt-4o-mini",
-            "template": """You are Minerva, an AI that helps news readers understand unfamiliar terms.
+            "template": """You are samā4, an AI that helps news readers understand unfamiliar terms.
 
 ENTITY TO EXPLAIN: {entity_name}
 ENTITY TYPE: {entity_type}
@@ -37,7 +37,7 @@ EXPLANATION:""",
         "v1": {
             "active": True,
             "model": "gpt-4o",
-            "template": """You are Minerva, an AI assistant helping a news reader understand an article.
+            "template": """You are samā4, an AI assistant helping a news reader understand an article.
 
 ARTICLE TITLE: {article_title}
 ARTICLE SUMMARY: {article_summary}

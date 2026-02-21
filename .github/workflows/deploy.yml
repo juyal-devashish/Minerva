@@ -37,6 +37,6 @@ jobs:
         uses: bervProject/railway-deploy@main
         with:
           railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: minerva-api
+          service: sama4-api
 
   # Frontend auto-deploys via Vercel GitHub integration

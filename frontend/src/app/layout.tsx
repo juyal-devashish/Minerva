@@ -16,7 +16,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Minerva - Contextual News Intelligence",
+  title: "samā4 - Contextual News Intelligence",
   description:
     "AI-powered explanations for unfamiliar terms, people, events, and concepts in news articles.",
 };

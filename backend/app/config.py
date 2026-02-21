@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
 
     # Database
-    database_url: str = "postgresql+asyncpg://minerva:minerva_dev@localhost:5432/minerva"
+    database_url: str = "postgresql+asyncpg://sama4:sama4_dev@localhost:5432/sama4"
     # Set automatically when sslmode=require is in DATABASE_URL; override with DATABASE_SSL=true/false
     database_ssl: bool = False
 
@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     # Pinecone
     pinecone_api_key: str = ""
     pinecone_environment: str = "us-east-1"
-    pinecone_index: str = "minerva-articles"
+    pinecone_index: str = "sama4-articles"
 
     # OpenAI
     openai_api_key: str = ""

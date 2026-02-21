@@ -1,8 +1,8 @@
-# Minerva — Mobile App Figma Design Prompt (MVP)
+# samā4 — Mobile App Figma Design Prompt (MVP)
 
 ## Product Summary
 
-Minerva is an AI-powered contextual news reader built as a native mobile app. When users read news articles, unfamiliar names, organizations, events, and concepts are automatically highlighted. Tapping a highlight reveals an instant, AI-generated context card — like a smart Wikipedia overlay built into the reading experience.
+samā4 is an AI-powered contextual news reader built as a native mobile app. When users read news articles, unfamiliar names, organizations, events, and concepts are automatically highlighted. Tapping a highlight reveals an instant, AI-generated context card — like a smart Wikipedia overlay built into the reading experience.
 
 Think: "Genius annotations for the news."
 
@@ -57,7 +57,7 @@ A neutral, highly readable sans-serif optimized for long-form mobile reading.
 
 ## Color System (Inspired by mlp.com)
 
-mlp.com uses a refined, professional palette: deep dark backgrounds, clean whites, and carefully restrained accent colors. Minerva adapts this into a mobile-native system with both light and dark modes.
+mlp.com uses a refined, professional palette: deep dark backgrounds, clean whites, and carefully restrained accent colors. samā4 adapts this into a mobile-native system with both light and dark modes.
 
 ### Light Mode
 
@@ -130,7 +130,7 @@ For MVP, design Feed, Search, and Profile. Bookmarks and Trending can be shown a
 
 **Layout (top to bottom)**:
 - **Status bar** (system)
-- **Top bar**: Minerva wordmark (Poppins ExtraBold, 20pt) left-aligned, notification bell icon right-aligned. Clean, no background color — blends with content area.
+- **Top bar**: samā4 wordmark (Poppins ExtraBold, 20pt) left-aligned, notification bell icon right-aligned. Clean, no background color — blends with content area.
 - **Greeting** (optional): "Good morning, Devashish" in Poppins Medium 16pt, Text (Secondary) color. Adds a personal touch.
 - **Category chips**: Horizontal scrollable row of pill-shaped category filters (All, Politics, Technology, Science, Business, Health, World). Active chip is filled with Accent (Primary), white text. Inactive chips are outlined with Border color, Text (Secondary).
 - **Article feed**: Vertical scrolling list of article cards with pull-to-refresh.
@@ -255,7 +255,7 @@ This is the most important UI component in the app. It's the "wow" moment.
   - Reading preferences (text size slider)
   - Dark mode toggle
   - Notification preferences
-  - About Minerva
+  - About samā4
   - Sign out
 - Each row: Roboto Regular 16pt, Text (Primary), with chevron right
 - This screen is low-priority for design polish — functional is fine
@@ -303,7 +303,7 @@ Design these as reusable Figma components with variants and auto-layout:
 
 | Interaction | Behavior |
 |-------------|----------|
-| Pull to refresh | Custom spinner with Minerva accent color, rubber-band overscroll |
+| Pull to refresh | Custom spinner with samā4 accent color, rubber-band overscroll |
 | Infinite scroll | Small spinner at feed bottom when loading more articles |
 | Card → Article | Shared element transition: card image expands to hero image |
 | Article → Feed | Swipe from left edge (iOS) or back gesture (Android) |
@@ -340,8 +340,8 @@ Design these as reusable Figma components with variants and auto-layout:
 
 ---
 
-## What Makes Minerva Visually Unique
+## What Makes samā4 Visually Unique
 
 The core differentiator is the **entity highlighting + context card** interaction. The design should make this feel magical — like the article is alive with knowledge. When a user taps a highlighted name and gets an instant, perfectly contextual explanation, that's the "wow" moment.
 
-The visual identity — Poppins + Roboto type pairing on a refined navy-and-gold palette — positions Minerva as a serious, trustworthy intelligence tool (not a casual news aggregator). It should feel like the intersection of Bloomberg Terminal polish and Instapaper reading comfort. The mlp.com DNA is in the restraint: generous whitespace, weight-based hierarchy, and an accent palette that whispers rather than shouts.
+The visual identity — Poppins + Roboto type pairing on a refined navy-and-gold palette — positions samā4 as a serious, trustworthy intelligence tool (not a casual news aggregator). It should feel like the intersection of Bloomberg Terminal polish and Instapaper reading comfort. The mlp.com DNA is in the restraint: generous whitespace, weight-based hierarchy, and an accent palette that whispers rather than shouts.

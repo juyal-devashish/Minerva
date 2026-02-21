@@ -1,4 +1,4 @@
-# Minerva
+# samā4
 
 AI powered contextual news intelligence platform. Provides instant, personalized explanations for unfamiliar terms, people, events, and concepts within news articles.
 
@@ -54,8 +54,8 @@ PostgreSQL  Redis     Pinecone   OpenAI API
 ### Local Development (SQLite, no Docker needed)
 
 ```bash
-git clone https://github.com/juyal-devashish/Minerva.git
-cd Minerva
+git clone https://github.com/juyal-devashish/samā4.git
+cd samā4
 cp .env.example .env
 # Edit .env with your OpenAI + Pinecone API keys
 
@@ -89,7 +89,7 @@ Once the backend is running: http://localhost:8000/docs
 ## Project Structure
 
 ```
-minerva/
+sama4/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # FastAPI entry + lifespan
@@ -189,7 +189,7 @@ Fetch (RSS) → Dedup (MinHash) → Clean (HTML strip) → NER (spaCy en_core_we
 
 Mobile-first design (393px) with Figma-matched design system:
 
-- **Splash screen**: Animated intro — "Minerva" text → owl logo + tagline → fade to app
+- **Splash screen**: Animated intro — "samā4" text → owl logo + tagline → fade to app
 - **Landing page**: Full-page card swiper (TikTok-style vertical scroll snap) — the default view on app open
 - **Traditional feed**: Hero card + scrollable list — accessible by swiping right from the card swiper
 - **Horizontal swipe**: `react-swipeable` + Framer Motion transitions between card swiper and feed list views

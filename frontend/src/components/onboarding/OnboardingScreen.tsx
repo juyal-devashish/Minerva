@@ -18,7 +18,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
       icon: Lightbulb,
       title: "Read smarter, not harder",
       subtitle:
-        "Minerva highlights key terms and entities in news articles, making complex stories easy to understand.",
+        "samā4 highlights key terms and entities in news articles, making complex stories easy to understand.",
       illustration: "📰",
     },
     {

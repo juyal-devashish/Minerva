@@ -1,8 +1,8 @@
-# CLAUDE.md - Minerva Project Instructions
+# CLAUDE.md - samā4 Project Instructions
 
 ## Project Overview
 
-**Minerva** is an AI-powered contextual news intelligence platform that provides instant explanations for unfamiliar terms, people, events, and concepts within news articles.
+**samā4** is an AI-powered contextual news intelligence platform that provides instant explanations for unfamiliar terms, people, events, and concepts within news articles.
 
 **Core Value Proposition**: Eliminate the friction between "I don't know this" and understanding — no tab-switching, no ChatGPT copy-paste, just inline context exactly when readers need it.
 
@@ -12,7 +12,7 @@
 
 ## Architecture (Actual Implementation)
 
-Minerva uses a **monolithic backend + SPA frontend** architecture:
+samā4 uses a **monolithic backend + SPA frontend** architecture:
 
 ```
 Frontend (Next.js 14 on Vercel)
@@ -51,7 +51,7 @@ PostgreSQL / SQLite  ·  Redis  ·  Pinecone  ·  OpenAI API
 ## Project Structure
 
 ```
-minerva/
+sama4/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # FastAPI entry + lifespan (scheduler, table creation)
@@ -274,7 +274,7 @@ OPENAI_API_KEY=sk-...            # GPT-4o-mini summaries + embeddings
 PINECONE_API_KEY=...             # Vector store
 
 # Optional (defaults work for local dev)
-DATABASE_URL=sqlite+aiosqlite:///./minerva.db  # Auto-detected; use postgresql+asyncpg://... for Postgres
+DATABASE_URL=sqlite+aiosqlite:///./sama4.db  # Auto-detected; use postgresql+asyncpg://... for Postgres
 REDIS_URL=redis://localhost:6379
 CORS_ORIGINS=["http://localhost:3000"]
 SENTRY_DSN=                      # Optional error tracking
@@ -328,7 +328,7 @@ make seed            # seed sample data
 
 ### Key UI Patterns
 - Mobile-first: `max-w-[393px] mx-auto` container
-- **Splash screen**: Animated intro — "Minerva" text (phase 0) → owl logo + "News, understood" tagline (phase 1) → fade out (phase 2)
+- **Splash screen**: Animated intro — "samā4" text (phase 0) → owl logo + "News, understood" tagline (phase 1) → fade out (phase 2)
 - **Landing page**: Full-page card swiper (CardSwiper) with vertical scroll-snap — default view on app open
 - **Swipeable feed**: Horizontal swipe (react-swipeable) toggles between CardSwiper (default) and traditional FeedList
 - **View indicator**: Bottom dots show which view is active (card swiper vs feed list)

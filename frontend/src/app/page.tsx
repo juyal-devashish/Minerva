@@ -23,11 +23,11 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
-    const onboarded = localStorage.getItem("minerva_onboarded");
+    const onboarded = localStorage.getItem("sama4_onboarded");
     if (!onboarded) {
       setShowOnboarding(true);
     }
-    const savedDark = localStorage.getItem("minerva_dark_mode");
+    const savedDark = localStorage.getItem("sama4_dark_mode");
     if (savedDark === "true") {
       setDarkMode(true);
       document.documentElement.classList.add("dark");
@@ -37,7 +37,7 @@ export default function HomePage() {
   const handleToggleDarkMode = () => {
     const next = !darkMode;
     setDarkMode(next);
-    localStorage.setItem("minerva_dark_mode", String(next));
+    localStorage.setItem("sama4_dark_mode", String(next));
     if (next) {
       document.documentElement.classList.add("dark");
     } else {
@@ -46,9 +46,9 @@ export default function HomePage() {
   };
 
   const handleOnboardingComplete = (selectedCategories: string[]) => {
-    localStorage.setItem("minerva_onboarded", "true");
+    localStorage.setItem("sama4_onboarded", "true");
     localStorage.setItem(
-      "minerva_categories",
+      "sama4_categories",
       JSON.stringify(selectedCategories)
     );
     setShowOnboarding(false);
@@ -89,8 +89,8 @@ export default function HomePage() {
                 <div className="flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <img
-                      src="/minerva-logo.jpg"
-                      alt="Minerva"
+                      src="/sama4-logo.jpg"
+                      alt="samā4"
                       className="w-7 h-7 object-contain"
                     />
                     <span
@@ -102,7 +102,7 @@ export default function HomePage() {
                         color: "var(--foreground)",
                       }}
                     >
-                      Minerva
+                      samā4
                     </span>
                   </div>
                   <button className="p-2 hover:bg-[var(--background-secondary)] rounded-full transition-colors">
