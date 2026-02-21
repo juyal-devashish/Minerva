@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str = ""
 
+    # Admin
+    admin_secret: str = "change-me-in-production"
+
     # Sentry
     sentry_dsn: str = ""
 

@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import articles, context, feed, search
+from app.routers import admin, articles, context, feed, search
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +62,7 @@ app.add_middleware(
 )
 
 # Routers
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 app.include_router(feed.router, prefix="/api/v1/feed", tags=["feed"])
 app.include_router(articles.router, prefix="/api/v1/articles", tags=["articles"])
 app.include_router(context.router, prefix="/api/v1/context", tags=["context"])
