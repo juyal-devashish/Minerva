@@ -1,4 +1,6 @@
-from pydantic import field_validator
+import re
+
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -13,16 +15,31 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = "postgresql+asyncpg://minerva:minerva_dev@localhost:5432/minerva"
+    # Set automatically when sslmode=require is in DATABASE_URL; override with DATABASE_SSL=true/false
+    database_ssl: bool = False
 
     @field_validator("database_url", mode="before")
     @classmethod
     def normalize_db_url(cls, v: str) -> str:
-        """Rewrite plain postgres(ql):// URLs to use asyncpg driver."""
+        """Rewrite plain postgres(ql):// URLs to use asyncpg driver.
+        Also strips sslmode — asyncpg rejects it; SSL is handled via connect_args instead.
+        """
         if v.startswith("postgres://"):
-            return v.replace("postgres://", "postgresql+asyncpg://", 1)
-        if v.startswith("postgresql://"):
-            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+            v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif v.startswith("postgresql://"):
+            v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        # Strip sslmode query param — asyncpg doesn't accept it
+        v = re.sub(r"[?&]sslmode=[^&]*", "", v).rstrip("?&")
         return v
+
+    @model_validator(mode="after")
+    def auto_set_ssl(self) -> "Settings":
+        """Enable SSL automatically if the original DATABASE_URL contained sslmode=require."""
+        import os
+        raw = os.environ.get("DATABASE_URL", "")
+        if not self.database_ssl and "sslmode=require" in raw:
+            self.database_ssl = True
+        return self
 
     # Redis
     redis_url: str = "redis://localhost:6379"
