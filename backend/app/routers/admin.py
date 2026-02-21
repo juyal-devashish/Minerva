@@ -74,7 +74,9 @@ async def seed_database(
     """
     _check_secret(x_admin_secret)
 
+    from app.database import create_tables
     from app.seed import seed
 
+    await create_tables()
     await seed()
     return AdminResponse(message="Seed complete (skipped if data already existed).", status="ok")
