@@ -4,15 +4,27 @@ from dataclasses import dataclass
 logger = logging.getLogger(__name__)
 
 ENTITY_TYPE_MAP = {
+    # People
     "PERSON": "PERSON",
+    # Organizations & groups
     "ORG": "ORG",
-    "GPE": "LOCATION",
+    "NORP": "ORG",  # nationalities, religious/political groups
+    # Locations
+    "GPE": "LOCATION",  # countries, cities, states
+    "LOC": "LOCATION",  # non-GPE locations (mountains, rivers)
+    "FAC": "LOCATION",  # facilities (airports, bridges)
+    # Events
     "EVENT": "EVENT",
+    # Concepts
     "WORK_OF_ART": "CONCEPT",
     "LAW": "CONCEPT",
+    "PRODUCT": "CONCEPT",
 }
 
 ALLOWED_LABELS = set(ENTITY_TYPE_MAP.keys())
+
+# spaCy labels we intentionally skip (too noisy for news context):
+# DATE, TIME, MONEY, PERCENT, QUANTITY, ORDINAL, CARDINAL, LANGUAGE
 
 
 @dataclass
@@ -24,6 +36,7 @@ class ExtractedEntity:
     start: int
     end: int
     in_title: bool
+    mention_count: int
     priority: str
 
 
@@ -88,6 +101,7 @@ class NERService:
                     start=ent.start_char,
                     end=ent.end_char,
                     in_title=in_title,
+                    mention_count=mention_count,
                     priority=priority,
                 )
             )
