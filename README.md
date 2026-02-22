@@ -4,7 +4,7 @@ AI powered contextual news intelligence platform. Provides instant, personalized
 
 ## Live Demo
 
-- **Frontend**: [frontend-roan-nine-nf5erh3avr.vercel.app](https://frontend-roan-nine-nf5erh3avr.vercel.app)
+- **Frontend**: [https://www.sama4.online/](https://www.sama4.online/)
 - **Backend API docs**: http://localhost:8000/docs (local)
 
 ## Architecture
