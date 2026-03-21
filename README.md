@@ -1,4 +1,4 @@
-# Samā4 (Sāmāchar)
+# Sama4 (Samachar)
 
 AI powered contextual news intelligence platform. Provides instant, personalized explanations for unfamiliar terms, people, events, and concepts within news articles.
 
