@@ -11,6 +11,7 @@ import { ProfileScreen } from "@/components/profile/ProfileScreen";
 import { PlaceholderScreen } from "@/components/ui/PlaceholderScreen";
 import { OnboardingScreen } from "@/components/onboarding/OnboardingScreen";
 import { SplashScreen } from "@/components/SplashScreen";
+import { TrendingScreen } from "@/components/prediction/TrendingScreen";
 
 export default function HomePage() {
   const router = useRouter();
@@ -140,11 +141,7 @@ export default function HomePage() {
             )}
 
             {activeTab === "trending" && (
-              <PlaceholderScreen
-                icon="📈"
-                title="Trending"
-                message="Discover what's trending. Popular stories will appear here."
-              />
+              <TrendingScreen />
             )}
 
             {activeTab === "profile" && (

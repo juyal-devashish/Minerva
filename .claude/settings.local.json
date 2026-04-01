@@ -29,7 +29,19 @@
       "Bash(/opt/homebrew/opt/python@3.12/bin/python3.12:*)",
       "Bash(pip3 show:*)",
       "Bash(poetry run ruff check:*)",
-      "Bash(poetry run ruff format:*)"
+      "Bash(poetry run ruff format:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:dev.to)",
+      "Bash(python -c \"from app.models import Prediction, AgentPerspective; from app.schemas.prediction import PredictionDetail, TrendingPrediction; from app.routers.predictions import router; print\\(''All backend imports OK''\\)\")",
+      "Bash(python -m py_compile app/models/prediction.py)",
+      "Bash(python -m py_compile app/schemas/prediction.py)",
+      "Bash(python -m py_compile app/services/mirofish_service.py)",
+      "Bash(python -m py_compile app/services/prediction_service.py)",
+      "Bash(python -m py_compile app/routers/predictions.py)",
+      "Bash(python -m py_compile app/ingestion/ner.py)",
+      "Bash(python -m py_compile app/ingestion/pipeline.py)",
+      "Bash(python -m py_compile app/services/ner_service.py)"
     ]
   }
 }

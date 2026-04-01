@@ -5,6 +5,14 @@ import type {
   ReferenceResponse,
   ExplainRequest,
   ExplainResponse,
+  PredictionDetail,
+  PredictionSummary,
+  PredictionStatus,
+  PredictionChatRequest,
+  PredictionChatResponse,
+  AgentInterviewRequest,
+  AgentInterviewResponse,
+  TrendingPrediction,
 } from "@/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -53,5 +61,53 @@ export const api = {
       method: "POST",
       body: JSON.stringify(request),
     });
+  },
+
+  // ============ Predictions (MiroFish) ============
+
+  getArticlePrediction(articleId: string) {
+    return fetchAPI<PredictionDetail | null>(
+      `/api/v1/predictions/article/${articleId}`
+    );
+  },
+
+  triggerSimulation(articleId: string, options?: {
+    agent_count?: number;
+    simulation_rounds?: number;
+    prediction_focus?: string;
+  }) {
+    return fetchAPI<PredictionSummary>(`/api/v1/predictions/simulate`, {
+      method: "POST",
+      body: JSON.stringify({
+        article_id: articleId,
+        ...options,
+      }),
+    });
+  },
+
+  getPredictionStatus(predictionId: string) {
+    return fetchAPI<PredictionStatus>(
+      `/api/v1/predictions/${predictionId}/status`
+    );
+  },
+
+  chatWithPrediction(request: PredictionChatRequest) {
+    return fetchAPI<PredictionChatResponse>(`/api/v1/predictions/chat`, {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  },
+
+  interviewAgent(request: AgentInterviewRequest) {
+    return fetchAPI<AgentInterviewResponse>(`/api/v1/predictions/interview`, {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  },
+
+  getTrendingPredictions(limit: number = 20) {
+    return fetchAPI<TrendingPrediction[]>(
+      `/api/v1/predictions/trending?limit=${limit}`
+    );
   },
 };

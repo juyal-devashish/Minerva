@@ -20,6 +20,7 @@ from app.services.cache_service import CacheService
 from app.services.embedding_service import EmbeddingService
 from app.services.entity_service import EntityService
 from app.services.llm_service import LLMService
+from app.services.mirofish_service import MirofishClient
 
 
 class ContextService:
@@ -30,6 +31,7 @@ class ContextService:
         self.llm = LLMService()
         self.entity_service = EntityService()
         self.embedding_service = EmbeddingService()
+        self.mirofish = MirofishClient()
 
     async def get_context(self, entity: Entity, db: AsyncSession) -> ContextResponse:
         """Generate contextual explanation for an entity.
@@ -66,13 +68,16 @@ class ContextService:
         if entity.short_context and not self.llm.client:
             context_text = entity.short_context
         else:
-            # Retrieve knowledge
+            # Retrieve knowledge from multiple sources
             wikipedia_extract = await self.entity_service.get_wikipedia_extract(
                 entity.wikipedia_url or ""
             )
 
             # Search for related articles via embeddings
             await self.embedding_service.search(entity.canonical_name, top_k=3)
+
+            # Try to enrich context from MiroFish GraphRAG
+            mirofish_context = await self._get_mirofish_graph_context(entity)
 
             # Build prompt and call LLM
             prompt = PROMPTS["entity_context"]["v1"]["template"].format(
@@ -81,7 +86,7 @@ class ContextService:
                 article_excerpt="",
                 wikidata_facts="",
                 wikipedia_excerpt=wikipedia_extract or "No Wikipedia information available.",
-                related_articles_summaries="",
+                related_articles_summaries=mirofish_context,
             )
 
             context_text = await self.llm.generate(prompt, model="gpt-4o-mini", max_tokens=300)
@@ -129,19 +134,32 @@ class ContextService:
     ) -> ExplainResponse:
         """Answer a follow-up question about an entity.
 
-        Args:
-            entity: The entity being asked about.
-            article: The article providing context.
-            question: The user's question.
-            db: Database session.
-
-        Returns:
-            ExplainResponse with the answer.
+        Enhanced with MiroFish prediction data when available.
         """
         # Retrieve knowledge
         wikipedia_extract = await self.entity_service.get_wikipedia_extract(
             entity.wikipedia_url or ""
         )
+
+        # Check if there's a prediction for this article to enrich the answer
+        prediction_context = ""
+        try:
+            from app.models.prediction import Prediction
+            pred_result = await db.execute(
+                select(Prediction).where(
+                    Prediction.article_id == article.id,
+                    Prediction.status == "completed",
+                ).limit(1)
+            )
+            prediction = pred_result.scalar_one_or_none()
+            if prediction and prediction.prediction_summary:
+                prediction_context = (
+                    f"\n\nPREDICTION ANALYSIS (from multi-agent simulation):\n"
+                    f"{prediction.prediction_summary}\n"
+                    f"Key findings: {', '.join(prediction.key_findings or [])}"
+                )
+        except Exception:
+            pass
 
         prompt = PROMPTS["followup_question"]["v1"]["template"].format(
             article_title=article.title,
@@ -149,7 +167,7 @@ class ContextService:
             entity_name=entity.canonical_name,
             entity_context=entity.short_context or "",
             user_question=question,
-            retrieved_knowledge=wikipedia_extract or "",
+            retrieved_knowledge=(wikipedia_extract or "") + prediction_context,
         )
 
         answer = await self.llm.generate(
@@ -171,6 +189,22 @@ class ContextService:
             ],
             confidence=0.85,
         )
+
+    async def _get_mirofish_graph_context(self, entity: Entity) -> str:
+        """Query MiroFish's knowledge graph for richer entity context."""
+        try:
+            is_healthy = await self.mirofish.health_check()
+            if not is_healthy:
+                return ""
+
+            # Query the graph for entity relationships and context
+            result = await self.mirofish.query_graph(
+                project_id="global",
+                query=f"What are the key relationships and recent developments involving {entity.canonical_name}?",
+            )
+            return result.get("context", result.get("answer", ""))
+        except Exception:
+            return ""
 
     async def _get_related_entities(self, entity: Entity, db: AsyncSession) -> list[RelatedEntity]:
         """Find other entities that appear in the same articles."""

@@ -145,8 +145,10 @@ class IngestionPipeline:
         await db.flush()
 
         try:
-            # NER
-            entities = self.ner.extract_entities(cleaned, article_data.title)
+            # NER — hybrid: spaCy structural entities + LLM knowledge-gap detection
+            entities = await self.ner.extract_entities_hybrid(
+                cleaned, article_data.title, categories=[source_config["category"]]
+            )
 
             # Entity linking
             linked = await self.linker.link_entities(entities)

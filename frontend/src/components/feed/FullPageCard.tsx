@@ -3,6 +3,8 @@
 import { Bookmark, Share2, MoreHorizontal } from "lucide-react";
 import type { ArticleCard, EntityInArticle } from "@/types";
 import { formatTimeAgo } from "@/lib/utils";
+import { usePrediction } from "@/hooks/usePrediction";
+import { PredictionBadge } from "@/components/prediction/PredictionBadge";
 
 interface FullPageCardProps {
   article: ArticleCard;
@@ -91,6 +93,7 @@ export function FullPageCard({ article, entities, onClick, onEntityTap }: FullPa
   const readTime = article.reading_time_minutes
     ? `${article.reading_time_minutes} min read`
     : "";
+  const { data: prediction } = usePrediction(article.id);
 
   return (
     <div
@@ -116,6 +119,16 @@ export function FullPageCard({ article, entities, onClick, onEntityTap }: FullPa
         <button className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <MoreHorizontal size={18} className="text-white" />
         </button>
+        {/* Prediction Badge */}
+        {prediction && prediction.status !== "failed" && (
+          <div className="absolute bottom-3 left-3">
+            <PredictionBadge
+              status={prediction.status}
+              confidence={prediction.confidence_score}
+              onClick={onClick}
+            />
+          </div>
+        )}
       </div>
 
       {/* Content Section */}

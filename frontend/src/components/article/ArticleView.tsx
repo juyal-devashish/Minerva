@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Share2, Bookmark, ChevronRight } from "lucide-react";
+import { ArrowLeft, Share2, Bookmark, ChevronRight, Brain, Loader2 } from "lucide-react";
 import { ArticleContent } from "./ArticleContent";
 import { ContextPopup } from "@/components/context/ContextPopup";
 import { EntityBadge } from "@/components/ui/entity-badge";
+import { PredictionPanel } from "@/components/prediction/PredictionPanel";
+import { usePrediction, useTriggerSimulation, usePredictionStatus } from "@/hooks/usePrediction";
 import type { ArticleDetail, EntityInArticle } from "@/types";
 
 interface Props {
@@ -27,6 +29,19 @@ export function ArticleView({ article }: Props) {
   const [selectedEntity, setSelectedEntity] = useState<EntityInArticle | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { data: prediction, refetch: refetchPrediction } = usePrediction(article.id);
+  const triggerSimulation = useTriggerSimulation();
+  const { data: predictionStatus } = usePredictionStatus(
+    prediction?.id || "",
+    !!prediction && !["completed", "failed"].includes(prediction.status)
+  );
+
+  // Refetch prediction when status changes to completed
+  useEffect(() => {
+    if (predictionStatus?.status === "completed") {
+      refetchPrediction();
+    }
+  }, [predictionStatus?.status, refetchPrediction]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -196,7 +211,7 @@ export function ArticleView({ article }: Props) {
         </div>
 
         {/* Article Body */}
-        <div className="px-5 pb-8">
+        <div className="px-5 pb-4">
           <div
             style={{
               fontFamily: "Roboto, sans-serif",
@@ -210,6 +225,90 @@ export function ArticleView({ article }: Props) {
               onEntityTap={(entity) => setSelectedEntity(entity)}
             />
           </div>
+        </div>
+
+        {/* Prediction Section */}
+        <div className="px-5 pb-8">
+          {prediction && prediction.status === "completed" ? (
+            <PredictionPanel
+              prediction={prediction}
+              articleTitle={article.title}
+            />
+          ) : prediction && !["failed"].includes(prediction.status) ? (
+            /* Prediction in progress */
+            <div
+              className="rounded-2xl px-4 py-3 flex items-center gap-3"
+              style={{
+                backgroundColor: "var(--background-secondary)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <Loader2
+                size={18}
+                className="animate-spin"
+                style={{ color: "var(--accent-primary)" }}
+              />
+              <div>
+                <span
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: 500,
+                    fontSize: "14px",
+                    color: "var(--foreground)",
+                  }}
+                >
+                  Generating prediction...
+                </span>
+                <p
+                  style={{
+                    fontFamily: "Roboto, sans-serif",
+                    fontSize: "12px",
+                    color: "var(--text-tertiary)",
+                  }}
+                >
+                  {predictionStatus?.progress_message || "Analyzing with AI agents"}
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* No prediction — show trigger button */
+            <button
+              onClick={() =>
+                triggerSimulation.mutate({ articleId: article.id })
+              }
+              disabled={triggerSimulation.isPending}
+              className="w-full rounded-2xl px-4 py-3 flex items-center gap-3 transition-colors hover:opacity-90"
+              style={{
+                backgroundColor: "var(--background-secondary)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <Brain size={20} style={{ color: "var(--accent-primary)" }} />
+              <div className="text-left">
+                <span
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: 500,
+                    fontSize: "14px",
+                    color: "var(--foreground)",
+                  }}
+                >
+                  {triggerSimulation.isPending
+                    ? "Starting simulation..."
+                    : "What might happen next?"}
+                </span>
+                <p
+                  style={{
+                    fontFamily: "Roboto, sans-serif",
+                    fontSize: "12px",
+                    color: "var(--text-tertiary)",
+                  }}
+                >
+                  Run AI multi-agent prediction
+                </p>
+              </div>
+            </button>
+          )}
         </div>
       </div>
 

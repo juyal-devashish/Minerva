@@ -25,7 +25,7 @@ class NERService:
     """
 
     async def extract(self, content: str, title: str) -> list[ExtractedEntity]:
-        """Extract entities from text without persisting.
+        """Extract entities from text without persisting (spaCy only).
 
         Args:
             content: Article body text.
@@ -38,6 +38,20 @@ class NERService:
             return _engine.extract_entities(content, title)
         except Exception as exc:
             logger.error(f"NER extraction failed: {exc}")
+            raise NERServiceError(str(exc)) from exc
+
+    async def extract_hybrid(
+        self, content: str, title: str, categories: list[str] | None = None
+    ) -> list[ExtractedEntity]:
+        """Extract entities using spaCy + LLM knowledge-gap detection.
+
+        This is the preferred method — it identifies terms a reader wouldn't
+        know, not just standard named entities.
+        """
+        try:
+            return await _engine.extract_entities_hybrid(content, title, categories)
+        except Exception as exc:
+            logger.error(f"Hybrid NER extraction failed: {exc}")
             raise NERServiceError(str(exc)) from exc
 
     async def extract_and_store(

@@ -55,6 +55,16 @@ class Settings(BaseSettings):
     # Admin
     admin_secret: str = "change-me-in-production"
 
+    # MiroFish
+    mirofish_url: str = "http://localhost:5001"
+    mirofish_enabled: bool = True
+    mirofish_default_agents: int = 500
+    mirofish_default_rounds: int = 30
+    mirofish_simulation_timeout: int = 600  # 10 minutes max wait
+    mirofish_auto_simulate: bool = True  # auto-simulate high-impact articles
+    mirofish_impact_threshold: int = 5  # min entity count to auto-simulate
+    prediction_cache_ttl: int = 43200  # 12 hours
+
     # Sentry
     sentry_dsn: str = ""
 

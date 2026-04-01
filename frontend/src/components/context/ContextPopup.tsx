@@ -1,8 +1,9 @@
 "use client";
 
-import { ExternalLink, ChevronRight, X } from "lucide-react";
+import { ExternalLink, ChevronRight, X, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEntityContext } from "@/hooks/useEntityContext";
+import { usePrediction } from "@/hooks/usePrediction";
 import { EntityBadge } from "@/components/ui/entity-badge";
 import type { EntityInArticle } from "@/types";
 
@@ -15,6 +16,7 @@ interface Props {
 
 export function ContextPopup({ entity, articleId, onClose, onViewReferences }: Props) {
   const { data, isLoading, error } = useEntityContext(entity.id);
+  const { data: prediction } = usePrediction(articleId);
 
   return (
     <AnimatePresence>
@@ -165,6 +167,54 @@ export function ContextPopup({ entity, articleId, onClose, onViewReferences }: P
                     style={{ color: "var(--accent-secondary)" }}
                   />
                 </a>
+              )}
+
+              {/* Prediction Insight */}
+              {prediction && prediction.status === "completed" && prediction.prediction_summary && (
+                <div
+                  className="rounded-xl px-3 py-2.5 mb-4"
+                  style={{
+                    backgroundColor: "var(--background-secondary)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <Brain size={13} style={{ color: "var(--accent-primary)" }} />
+                    <span
+                      style={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontWeight: 500,
+                        fontSize: "12px",
+                        color: "var(--accent-primary)",
+                      }}
+                    >
+                      AI Prediction
+                    </span>
+                  </div>
+                  <p
+                    className="line-clamp-3"
+                    style={{
+                      fontFamily: "Roboto, sans-serif",
+                      fontSize: "13px",
+                      lineHeight: "1.4",
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    {prediction.prediction_summary}
+                  </p>
+                  {prediction.predicted_outcomes.length > 0 && (
+                    <p
+                      className="mt-1.5"
+                      style={{
+                        fontFamily: "Roboto, sans-serif",
+                        fontSize: "12px",
+                        color: "var(--text-tertiary)",
+                      }}
+                    >
+                      Most likely: {prediction.predicted_outcomes[0]}
+                    </p>
+                  )}
+                </div>
               )}
 
               {/* Divider */}

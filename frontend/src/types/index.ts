@@ -119,3 +119,90 @@ export interface ExplainResponse {
   sources: { type: string; title?: string; url?: string }[];
   confidence: number;
 }
+
+// ============ Predictions (MiroFish) ============
+
+export interface AgentPerspective {
+  id: string;
+  agent_name: string;
+  agent_role: string;
+  agent_persona?: string;
+  stance: "positive" | "negative" | "neutral" | "mixed";
+  perspective_text: string;
+  key_argument?: string;
+  influence_score: number;
+  sentiment_score?: number;
+}
+
+export interface PredictionSummary {
+  id: string;
+  status: string;
+  prediction_summary?: string;
+  confidence_score?: number;
+  impact_score: number;
+  agent_count: number;
+  completed_at?: string;
+}
+
+export interface PredictionDetail {
+  id: string;
+  article_id: string;
+  status: string;
+  agent_count: number;
+  simulation_rounds: number;
+  platforms: string[];
+  prediction_summary?: string;
+  key_findings: string[];
+  sentiment_distribution?: string;
+  predicted_outcomes: string[];
+  confidence_score?: number;
+  impact_score: number;
+  agent_perspectives: AgentPerspective[];
+  created_at: string;
+  completed_at?: string;
+}
+
+export interface PredictionStatus {
+  id: string;
+  status: string;
+  progress_message: string;
+}
+
+export interface PredictionChatRequest {
+  prediction_id: string;
+  message: string;
+  history: { role: string; content: string }[];
+}
+
+export interface PredictionChatResponse {
+  prediction_id: string;
+  response: string;
+  sources: string[];
+}
+
+export interface AgentInterviewRequest {
+  prediction_id: string;
+  agent_perspective_id: string;
+  question: string;
+}
+
+export interface AgentInterviewResponse {
+  agent_name: string;
+  agent_role: string;
+  response: string;
+  stance: string;
+}
+
+export interface TrendingPrediction {
+  id: string;
+  article_id: string;
+  article_title: string;
+  article_image_url?: string;
+  article_source: string;
+  prediction_summary?: string;
+  key_findings: string[];
+  impact_score: number;
+  confidence_score?: number;
+  agent_count: number;
+  completed_at?: string;
+}
